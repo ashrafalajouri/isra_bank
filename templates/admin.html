@@ -103,7 +103,26 @@
           <span class="badge">{{ s.status }}</span>
         </div>
         {% if s.type == 'question' %}
-          <p>{{ s.question_text }}</p>
+          <p>{{ s.question_text or 'سؤال بصيغة صورة' }}</p>
+          <p class="muted">نوع الامتحان: {{ s.exam_type }}</p>
+          {% if s.subject_name %}
+            <p class="muted">المادة المقترحة: {{ s.subject_name }}</p>
+          {% endif %}
+          {% if s.image_path %}
+            <img class="question-image" src="/static/{{ s.image_path }}" alt="صورة الاقتراح" />
+          {% endif %}
+          <div class="grid two">
+            <div class="card">
+              <p>الخيار A: {{ s.choice_a }}</p>
+              <p>الخيار B: {{ s.choice_b }}</p>
+              <p>الخيار C: {{ s.choice_c }}</p>
+              <p>الخيار D: {{ s.choice_d }}</p>
+            </div>
+            <div class="card">
+              <p>الإجابة المقترحة: {{ s.proposed_correct_choice }}</p>
+              <p>الشرح المقترح: {{ s.proposed_explanation }}</p>
+            </div>
+          </div>
           <form method="post" action="/admin/suggestions/{{ s.id }}/publish" class="form inline">
             <select name="subject_id" required>
               {% for sub in subjects %}

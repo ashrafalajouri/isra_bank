@@ -23,7 +23,7 @@ SECRET_KEY = "FBaa6P9yuuMHv79yoafs58UbhOUDj6NzRhWCa5HBdPMEMHZeRlCB0OXNj4ax2r9X"
 SESSION_COOKIE = "session"
 DB_PATH = "app.db"
 UPLOAD_DIR = Path("static/uploads")
-ALLOWED_IMAGE_EXTS = {".jpg", ".jpeg", ".png", ".webp"}
+ALLOWED_IMAGE_EXTS = {".jpg", ".jpeg", ".png", ".webp", ".jfif"}
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -129,6 +129,7 @@ def init_db():
             choice_d TEXT,
             proposed_correct_choice TEXT,
             proposed_explanation TEXT,
+            image_path TEXT,
             message TEXT,
             status TEXT NOT NULL DEFAULT 'new',
             created_at TEXT NOT NULL,
@@ -158,6 +159,7 @@ def init_db():
     conn.commit()
     ensure_column(conn, "questions", "image_path", "TEXT")
     ensure_column(conn, "questions", "source", "TEXT")
+    ensure_column(conn, "suggestions", "image_path", "TEXT")
 
     cur.execute("SELECT id FROM users WHERE role='admin' LIMIT 1")
     admin = cur.fetchone()
@@ -194,7 +196,11 @@ def save_upload_image(file: UploadFile) -> Optional[str]:
         return None
     ext = Path(file.filename).suffix.lower()
     if ext not in ALLOWED_IMAGE_EXTS:
-        return None
+        # fall back to content type if extension is missing/unknown
+        if file.content_type and file.content_type.startswith("image/"):
+            ext = ".jpg"
+        else:
+            return None
     name = f"{uuid.uuid4().hex}{ext}"
     dest = UPLOAD_DIR / name
     with dest.open("wb") as f:
@@ -352,9 +358,12 @@ def dashboard(request: Request):
         (user["id"],),
     ).fetchone()
     leaderboard = conn.execute(
-        "SELECT id, username, full_name, points FROM users ORDER BY points DESC, created_at ASC LIMIT 10"
+        "SELECT id, username, full_name, points FROM users WHERE role != 'admin' ORDER BY points DESC, created_at ASC LIMIT 10"
     ).fetchall()
-    rank_row = conn.execute("SELECT COUNT(*) + 1 AS rank FROM users WHERE points > ?", (user["points"],)).fetchone()
+    rank_row = conn.execute(
+        "SELECT COUNT(*) + 1 AS rank FROM users WHERE role != 'admin' AND points > ?",
+        (user["points"],),
+    ).fetchone()
     conn.close()
 
     return templates.TemplateResponse(
@@ -521,8 +530,8 @@ def contact_suggest(request: Request, subject_id: Optional[str] = Form(None), su
     user = get_current_user(request)
     conn = get_db()
     conn.execute(
-        "INSERT INTO suggestions (user_id, type, subject_name, subject_id, exam_type, question_text, choice_a, choice_b, choice_c, choice_d, proposed_correct_choice, proposed_explanation, status, created_at) VALUES (?, 'question', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'new', ?)",
-        (user["id"] if user else None, subject_name, subject_id or None, exam_type, question_text, choice_a, choice_b, choice_c, choice_d, proposed_correct_choice, proposed_explanation, now_iso()),
+        "INSERT INTO suggestions (user_id, type, subject_name, subject_id, exam_type, question_text, choice_a, choice_b, choice_c, choice_d, proposed_correct_choice, proposed_explanation, image_path, status, created_at) VALUES (?, 'question', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'new', ?)",
+        (user["id"] if user else None, subject_name, subject_id or None, exam_type, question_text, choice_a, choice_b, choice_c, choice_d, proposed_correct_choice, proposed_explanation, None, now_iso()),
     )
     conn.commit()
     conn.close()
@@ -685,7 +694,7 @@ def admin_publish_suggestion(request: Request, suggestion_id: int, subject_id: i
 
     conn.execute(
         "INSERT INTO questions (subject_id, exam_type, question_text, choice_a, choice_b, choice_c, choice_d, correct_choice, image_path, source, explanation, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-        (subject_id, exam_type, sug["question_text"] or "", sug["choice_a"] or "", sug["choice_b"] or "", sug["choice_c"] or "", sug["choice_d"] or "", sug["proposed_correct_choice"] or "A", None, "past", sug["proposed_explanation"], now_iso(), now_iso()),
+        (subject_id, exam_type, sug["question_text"] or "", sug["choice_a"] or "", sug["choice_b"] or "", sug["choice_c"] or "", sug["choice_d"] or "", sug["proposed_correct_choice"] or "A", sug["image_path"], "past", sug["proposed_explanation"], now_iso(), now_iso()),
     )
     conn.execute("UPDATE suggestions SET status = 'published' WHERE id = ?", (suggestion_id,))
     conn.commit()
@@ -700,10 +709,10 @@ def admin_reject_suggestion(request: Request, suggestion_id: int):
     if isinstance(admin, RedirectResponse):
         return admin
     conn = get_db()
-    conn.execute("UPDATE suggestions SET status = 'rejected' WHERE id = ?", (suggestion_id,))
+    conn.execute("DELETE FROM suggestions WHERE id = ?", (suggestion_id,))
     conn.commit()
     conn.close()
-    request.session["flash"] = "تم رفض الاقتراح"
+    request.session["flash"] = "تم حذف الاقتراح"
     return RedirectResponse(url="/admin", status_code=303)
 
 
