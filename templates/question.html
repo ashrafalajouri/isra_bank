@@ -1,55 +1,114 @@
-﻿{% set title = "سؤال" %}
+{% set title = "سؤال" %}
 {% extends "base.html" %}
 {% block content %}
-<section class="card">
-  <h2>
-    {{ q.subject_name }} —
-    {% if q.exam_type == 'mid' %}منتصف الفصل{% elif q.exam_type == 'final' %}نهائي{% else %}كلاهما{% endif %}
-  </h2>
-  {% if q.image_path %}
-    <img class="question-image" src="/static/{{ q.image_path }}" alt="صورة السؤال" />
-  {% endif %}
-  {% if q.question_text %}
-    <p class="question-text">{{ q.question_text }}</p>
-  {% endif %}
-
-  <form method="post" action="/questions/{{ q.id }}/answer" class="choices">
-    <label><input type="radio" name="choice" value="A" required /> A) {{ q.choice_a }}</label>
-    <label><input type="radio" name="choice" value="B" /> B) {{ q.choice_b }}</label>
-    <label><input type="radio" name="choice" value="C" /> C) {{ q.choice_c }}</label>
-    <label><input type="radio" name="choice" value="D" /> D) {{ q.choice_d }}</label>
-    <button class="btn" type="submit">إرسال الإجابة</button>
-  </form>
-
-  {% if user %}
-    <a class="link" href="/questions/{{ q.id }}/result">عرض آخر نتيجة</a>
-  {% endif %}
-
-  <div class="nav-links">
-    {% if prev_id %}
-      <a class="btn ghost" href="/questions/{{ prev_id }}">السؤال السابق</a>
-    {% endif %}
-    {% if next_id %}
-      <a class="btn ghost" href="/questions/{{ next_id }}">السؤال التالي</a>
-    {% endif %}
+<section class="question-shell">
+  <div class="question-head">
+    <div class="breadcrumb compact">
+      <a href="/">الرئيسية</a>
+      <span>›</span>
+      {% if q.source == 'ai' %}
+        <span>أسئلة AI</span>
+      {% else %}
+        <span>أسئلة سابقة</span>
+        <span>›</span>
+        <span>{% if q.exam_type == 'mid' %}منتصف الفصل{% elif q.exam_type == 'final' %}نهائي{% else %}كلاهما{% endif %}</span>
+      {% endif %}
+    </div>
+    <a class="btn ghost" href="{% if q.source == 'ai' %}/subjects?source=ai{% else %}/subjects?source=past&exam={{ q.exam_type }}{% endif %}">رجوع للقائمة</a>
   </div>
 
-  <hr />
-  <h3>الإبلاغ عن خطأ</h3>
-  <form method="post" action="/questions/{{ q.id }}/report" class="form">
-    <label>وصف الخطأ</label>
-    <textarea name="report_text" required></textarea>
-    <label>الإجابة الصحيحة المقترحة (اختياري)</label>
-    <select name="proposed_correct_choice">
-      <option value="">--</option>
-      <option value="A">A</option>
-      <option value="B">B</option>
-      <option value="C">C</option>
-      <option value="D">D</option>
-    </select>
-    <label>شرح مقترح (اختياري)</label>
-    <textarea name="proposed_explanation"></textarea>
-    <button class="btn ghost" type="submit">إرسال البلاغ</button>
-  </form>
+  <div class="subject-header clean">
+    <h2>{{ q.subject_name }}</h2>
+    <div class="badges">
+      {% if q.source == 'ai' %}
+        <span class="badge">أسئلة AI</span>
+      {% else %}
+        <span class="badge">أسئلة سابقة</span>
+        <span class="badge">{% if q.exam_type == 'mid' %}منتصف الفصل{% elif q.exam_type == 'final' %}نهائي{% else %}كلاهما{% endif %}</span>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="question-grid">
+    <div class="card question-card">
+      <div class="card-head">
+        <span class="q-badge">سؤال #{{ q.id }}</span>
+      </div>
+      {% if q.image_path %}
+        <img class="question-image" src="/static/{{ q.image_path }}" alt="صورة السؤال" />
+      {% endif %}
+      {% if q.question_text %}
+        <p class="question-text">{{ q.question_text }}</p>
+      {% endif %}
+    </div>
+
+    <div class="card answer-card">
+      <h3>اختر الإجابة</h3>
+      <form method="post" action="/questions/{{ q.id }}/answer" class="choices modern">
+        <label class="choice-pill">
+          <input type="radio" name="choice" value="A" required />
+          <span class="choice-letter">A</span>
+          <span class="choice-text">{{ q.choice_a }}</span>
+        </label>
+        <label class="choice-pill">
+          <input type="radio" name="choice" value="B" />
+          <span class="choice-letter">B</span>
+          <span class="choice-text">{{ q.choice_b }}</span>
+        </label>
+        <label class="choice-pill">
+          <input type="radio" name="choice" value="C" />
+          <span class="choice-letter">C</span>
+          <span class="choice-text">{{ q.choice_c }}</span>
+        </label>
+        <label class="choice-pill">
+          <input type="radio" name="choice" value="D" />
+          <span class="choice-letter">D</span>
+          <span class="choice-text">{{ q.choice_d }}</span>
+        </label>
+        <div class="answer-actions">
+          <button class="btn" type="submit">إرسال الإجابة</button>
+          {% if prev_id %}
+            <a class="btn ghost" href="/questions/{{ prev_id }}">السؤال السابق</a>
+          {% endif %}
+          {% if next_id %}
+            <a class="btn ghost" href="/questions/{{ next_id }}">السؤال التالي</a>
+          {% endif %}
+        </div>
+      </form>
+
+      {% if user %}
+        <a class="link subtle" href="/questions/{{ q.id }}/result">عرض آخر نتيجة</a>
+      {% endif %}
+
+      <button class="btn ghost danger" type="button" onclick="document.getElementById('reportModal').classList.remove('hidden')">🚩 الإبلاغ عن خطأ</button>
+    </div>
+  </div>
 </section>
+
+<div id="reportModal" class="modal hidden">
+  <div class="modal-card">
+    <div class="modal-head">
+      <h3>الإبلاغ عن خطأ</h3>
+      <button class="icon-btn" type="button" onclick="document.getElementById('reportModal').classList.add('hidden')">×</button>
+    </div>
+    <form method="post" action="/questions/{{ q.id }}/report" class="form">
+      <label>وصف الخطأ</label>
+      <textarea name="report_text" required></textarea>
+      <label>الإجابة الصحيحة المقترحة (اختياري)</label>
+      <select name="proposed_correct_choice">
+        <option value="">--</option>
+        <option value="A">A</option>
+        <option value="B">B</option>
+        <option value="C">C</option>
+        <option value="D">D</option>
+      </select>
+      <label>شرح مقترح (اختياري)</label>
+      <textarea name="proposed_explanation"></textarea>
+      <div class="modal-actions">
+        <button class="btn" type="submit">إرسال البلاغ</button>
+        <button class="btn ghost" type="button" onclick="document.getElementById('reportModal').classList.add('hidden')">إلغاء</button>
+      </div>
+    </form>
+  </div>
+</div>
 {% endblock %}

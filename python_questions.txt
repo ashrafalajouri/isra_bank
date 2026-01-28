@@ -1,0 +1,1163 @@
+diff --git a/c:\Users\Administrator\Desktop\isra myweb\seed_bulk_questions.py b/c:\Users\Administrator\Desktop\isra myweb\seed_bulk_questions.py
+new file mode 100644
+--- /dev/null
++++ b/c:\Users\Administrator\Desktop\isra myweb\seed_bulk_questions.py
+@@ -0,0 +1,1158 @@
++import sqlite3
++from datetime import datetime
++
++DB = "app.db"
++subject_name = "بايثون"
++
++questions = [
++    {
++        "q": "What does a List allow you to do?",
++        "choices": [
++            "Store only one value",
++            "Store many values in a single variable",
++            "Store only numbers",
++            "Store only strings",
++        ],
++        "correct": "B",
++        "ex": """The correct answer is B because the slide states:
++“A List is a kind of collection that allows us to put many values in a single ‘variable’.”
++Programming_1 2025_Chapter 5
++
++الشرح (عربي):
++الإجابة الصحيحة هي B لأن النص يقول حرفيًا:
++“A List is a kind of collection that allows us to put many values in a single ‘variable’.”
++يعني الـ List تسمح بتخزين عدة قيم داخل متغير واحد، لذلك:
++A خطأ لأنها تقول قيمة واحدة فقط
++C خطأ لأنها تحصرها بالأرقام
++D خطأ لأنها تحصرها بالنصوص""",
++    },
++    {
++        "q": "How are list constants written in Python?",
++        "choices": [
++            "Using parentheses ( )",
++            "Using curly braces { }",
++            "Using square brackets [ ]",
++            'Using quotation marks " "',
++        ],
++        "correct": "C",
++        "ex": """The slide states:
++“List constants are surrounded by square brackets.”
++Programming_1 2025_Chapter 5
++
++الشرح (عربي):
++الإجابة الصحيحة C لأن النص يقول:
++“List constants are surrounded by square brackets.”
++يعني القوائم تُكتب بين أقواس مربعة [ ]، لذلك:
++A خطأ لأن الأقواس ( ) تستخدم لأشياء أخرى
++B خطأ لأنها خاصة بالـ set أو dictionary
++D خطأ لأنها للنصوص""",
++    },
++    {
++        "q": "What is the result of concatenating two lists using the + operator?",
++        "choices": [
++            "The lists are subtracted",
++            "The two lists are merged into one list",
++            "The elements are automatically sorted",
++            "An error occurs",
++        ],
++        "correct": "B",
++        "ex": """The slide shows:
++“c = a + b … print(c) #[1, 2, 3, 4, 5, 6]”
++Programming_1 2025_Chapter 5
++
++الشرح (عربي):
++الإجابة الصحيحة B لأن المثال يوضح أن:
++a + b ينتج قائمة واحدة تحتوي عناصر القائمتين معًا.
++لذلك:
++A خطأ لأنه لا يوجد طرح
++C خطأ لأنه لا يوجد ترتيب تلقائي
++D خطأ لأنه لا يحدث خطأ""",
++    },
++    {
++        "q": "Which method is used to sort a list in Python?",
++        "choices": ["order()", "arrange()", "sort()", "rank()"],
++        "correct": "C",
++        "ex": """The slide shows:
++“t.sort() … print(t)”
++Programming_1 2025_Chapter 5
++
++الشرح (عربي):
++الإجابة الصحيحة C لأن المثال يستخدم:
++t.sort()
++وهذا يعني أن الدالة المسؤولة عن الترتيب هي sort()، لذلك:
++A وB وD غير موجودة في السلايد""",
++    },
++    {
++        "q": "From which number does list indexing start?",
++        "choices": ["1", "0", "-1", "Depends on the list size"],
++        "correct": "B",
++        "ex": """The slide states:
++“Lists start their index at 0.”
++Programming_1 2025_Chapter 5
++
++الشرح (عربي):
++الإجابة الصحيحة B لأن النص يقول:
++“Lists start their index at 0.”
++يعني أول عنصر في القائمة فهرسه 0 وليس 1، لذلك:
++A خطأ
++C خطأ
++D خطأ""",
++    },
++    {
++        "q": "What does the reverse() function do to a list?",
++        "choices": [
++            "Sorts the list in ascending order",
++            "Deletes the list",
++            "Reverses the order of the list elements",
++            "Copies the list into a new list",
++        ],
++        "correct": "C",
++        "ex": """The slide states:
++“Using reverse() function will do as it says reverses the list.”
++
++الشرح (عربي):
++الإجابة الصحيحة هي C لأن النص يقول حرفيًا:
++“Using reverse() function will do as it says reverses the list.”
++أي أن الدالة تقوم بعكس ترتيب العناصر داخل القائمة.
++لذلك:
++A خطأ لأن الترتيب يتم باستخدام sort()
++B خطأ لأنها لا تحذف القائمة
++D خطأ لأنها لا تنشئ نسخة جديدة""",
++    },
++    {
++        "q": "How can you check if an object exists in a list?",
++        "choices": ["Using has", "Using in", "Using find()", "Using search()"],
++        "correct": "B",
++        "ex": """The slide states:
++“We can determine if the object is an element in the list using in operator.”
++
++الشرح (عربي):
++الإجابة الصحيحة هي B لأن النص يقول:
++“We can determine if the object is an element in the list using in operator.”
++يعني نستخدم الكلمة in للتأكد إن كان العنصر موجود داخل القائمة.
++لذلك:
++A خطأ لأنها غير موجودة
++C وD خطأ لأنها غير مذكورة في السلايد""",
++    },
++    {
++        "q": "Which statement about tuples is correct?",
++        "choices": [
++            "Tuples can be modified after creation",
++            "Tuples are indexed starting at 0",
++            "Tuples are unordered",
++            "Tuples use square brackets [ ]",
++        ],
++        "correct": "B",
++        "ex": """The slide states:
++“Tuples are another kind of sequence that function much like a list – they have elements which are indexed starting at 0.”
++
++الشرح (عربي):
++الإجابة الصحيحة هي B لأن النص يقول:
++“they have elements which are indexed starting at 0.”
++يعني عناصر الـ tuple تبدأ فهارسها من الصفر مثل الـ list.
++لذلك:
++A خطأ لأن الـ tuple لا يمكن تعديلها
++C خطأ لأنها ليست غير مرتبة
++D خطأ لأنها تُكتب باستخدام الأقواس ()""",
++    },
++    {
++        "q": "Why does this code produce an error? depts[1] = 'CS'",
++        "choices": [
++            "Because tuples are unordered",
++            "Because tuples do not support item assignment",
++            "Because tuples are empty",
++            "Because tuples store only numbers",
++        ],
++        "correct": "B",
++        "ex": """The slide shows:
++“TypeError: 'tuple' object does not support item assignment.”
++
++الشرح (عربي):
++الإجابة الصحيحة هي B لأن الخطأ المعروض يقول:
++“TypeError: 'tuple' object does not support item assignment.”
++يعني لا يمكن تعديل عناصر الـ tuple بعد إنشائها.
++لذلك:
++A خطأ
++C خطأ
++D خطأ""",
++    },
++    {
++        "q": "What is the purpose of the range() function?",
++        "choices": [
++            "To generate integer numbers for iteration",
++            "To sort a list",
++            "To remove elements from a list",
++            "To convert strings into integers",
++        ],
++        "correct": "A",
++        "ex": """The slide states:
++“The range is built-in function which is used to generate integer numbers and is frequently used to iterate through list.”
++
++الشرح (عربي):
++الإجابة الصحيحة هي A لأن النص يقول:
++“used to generate integer numbers and is frequently used to iterate through list.”
++يعني وظيفتها توليد أرقام صحيحة تُستخدم غالبًا في الحلقات التكرارية.
++لذلك:
++B خطأ
++C خطأ
++D خطأ""",
++    },
++    {
++        "q": "What are the arguments of the range() function?",
++        "choices": ["start, end", "min, max", "start, stop, step", "first, last, size"],
++        "correct": "C",
++        "ex": """The slide states:
++“The range function consist of start, stop & step are arguments to the range.”
++
++الشرح (عربي):
++الإجابة الصحيحة هي C لأن النص يقول:
++“The range function consist of start, stop & step are arguments to the range.”
++يعني الدالة range() تتكون من ثلاث معاملات: البداية، النهاية، والخطوة.
++لذلك:
++A خطأ لأنها ناقصة step
++B و D غير مذكورة في السلايدات""",
++    },
++    {
++        "q": "What does the len() function return?",
++        "choices": [
++            "The type of the object",
++            "The number of items in an object",
++            "The first element of the object",
++            "The sum of elements",
++        ],
++        "correct": "B",
++        "ex": """The slide states:
++“The len() function in Python is a built-in function that returns the number of items in an object.”
++
++الشرح (عربي):
++الإجابة الصحيحة هي B لأن النص يقول:
++“returns the number of items in an object.”
++يعني len() تُرجع عدد العناصر داخل الكائن.
++لذلك:
++A خطأ
++C خطأ
++D خطأ""",
++    },
++    {
++        "q": "Which of the following correctly converts a range object to a list?",
++        "choices": ["list(range(5))", "tuple(range(5))", "set(range(5))", "dict(range(5))"],
++        "correct": "A",
++        "ex": """The slide shows:
++“x = range(6) x = list(x) # converting to list print(x)”
++
++الشرح (عربي):
++الإجابة الصحيحة هي A لأن المثال يقول:
++“x = list(x) # converting to list”
++يعني لتحويل range إلى list نستخدم list().
++لذلك:
++B يحولها إلى tuple
++C يحولها إلى set
++D غير صحيح""",
++    },
++    {
++        "q": "Which statement about a range object is correct?",
++        "choices": ["It is always a list", "It is of type range", "It is of type tuple", "It is of type set"],
++        "correct": "B",
++        "ex": """The slide shows:
++“print(type(range(3))) # return <class 'range'>”
++
++الشرح (عربي):
++الإجابة الصحيحة هي B لأن النص يقول:
++“<class 'range'>”
++يعني نوع الكائن الناتج من range هو range نفسه.
++لذلك:
++A خطأ
++C خطأ
++D خطأ""",
++    },
++    {
++        "q": "How can you access all items in a list using range()?",
++        "choices": [
++            "By using range(len(list))",
++            "By using range(list)",
++            "By using range(list.size)",
++            "By using list(range)",
++        ],
++        "correct": "A",
++        "ex": """The slide states:
++“for i in range(len(pl_list))”
++
++الشرح (عربي):
++الإجابة الصحيحة هي A لأن النص يقول:
++“for i in range(len(pl_list))”
++يعني نستخدم range مع len للحصول على جميع الفهارس والوصول لكل عناصر القائمة.
++لذلك:
++B و C و D غير صحيحة""",
++    },
++    {
++        "q": "Which statement correctly describes a Set?",
++        "choices": [
++            "It is ordered and indexed",
++            "It allows duplicate values",
++            "It is unordered, unindexed, and does not allow duplicate values",
++            "It stores only numbers",
++        ],
++        "correct": "C",
++        "ex": """The slide states:
++“It is unordered, unchangeable, and unindexed, and do not allow duplicate values.”
++
++الشرح (عربي):
++الإجابة الصحيحة هي C لأن النص يقول حرفيًا:
++“It is unordered, unchangeable, and unindexed, and do not allow duplicate values.”
++يعني الـ Set غير مرتبة، غير مفهرسة، ولا تسمح بتكرار القيم.
++لذلك:
++A خطأ
++B خطأ
++D خطأ""",
++    },
++    {
++        "q": "Which values are considered the same in a Set?",
++        "choices": ["1 and 2", "True and 1", '"1" and 1', "0 and 2"],
++        "correct": "B",
++        "ex": """The slide states:
++“The values (True and 1) and (False and 0) are considered the same value in sets.”
++
++الشرح (عربي):
++الإجابة الصحيحة هي B لأن النص يقول:
++“The values (True and 1)… are considered the same value in sets.”
++يعني القيمة True والرقم 1 يُحسبان نفس القيمة داخل الـ Set.
++لذلك:
++A خطأ
++C خطأ
++D خطأ""",
++    },
++    {
++        "q": "How do you correctly create an empty set?",
++        "choices": ["empty = {}", "empty = []", "empty = set()", "empty = ()"],
++        "correct": "C",
++        "ex": """The slide states:
++“empty_set = set() # do not use {}”
++
++الشرح (عربي):
++الإجابة الصحيحة هي C لأن النص يقول:
++“empty_set = set() # do not use {}”
++يعني لإنشاء Set فارغة يجب استخدام set() وليس {}.
++لذلك:
++A خطأ
++B خطأ
++D خطأ""",
++    },
++    {
++        "q": "Which operator is used to merge two sets (union)?",
++        "choices": ["&", "|", "-", "^"],
++        "correct": "B",
++        "ex": """The slide states:
++“Two sets can be merged using union operation (or | ).”
++
++الشرح (عربي):
++الإجابة الصحيحة هي B لأن النص يقول:
++“union operation (or | ).”
++يعني دمج مجموعتين يتم باستخدام الرمز |.
++لذلك:
++A خطأ
++C خطأ
++D غير مذكور""",
++    },
++    {
++        "q": "Which method removes an arbitrary element from a set?",
++        "choices": ["remove()", "discard()", "pop()", "delete()"],
++        "correct": "C",
++        "ex": """The slide states:
++“pop element (removes arbitrary element).”
++
++الشرح (عربي):
++الإجابة الصحيحة هي C لأن النص يقول:
++“pop element (removes arbitrary element).”
++يعني pop() تحذف عنصرًا عشوائيًا من الـ Set.
++لذلك:
++A تحذف عنصر محدد
++B تحذف بدون خطأ عند عدم وجود العنصر
++D غير موجودة""",
++    },
++    {
++        "q": "What is a Dictionary in Python?",
++        "choices": [
++            "An ordered collection of values",
++            "A collection of Key/Value pairs",
++            "A list of numbers only",
++            "A sequence indexed by position",
++        ],
++        "correct": "B",
++        "ex": """The slide states:
++“A ‘bag’ of values, each with its own label (key)… a collection of Key/Value pairs.”
++
++الشرح (عربي):
++الإجابة الصحيحة هي B لأن النص يقول:
++“A ‘bag’ of values, each with its own label (key)… a collection of Key/Value pairs.”
++يعني الـ Dictionary عبارة عن مجموعة من الأزواج (مفتاح وقيمة).
++لذلك:
++A خطأ
++C خطأ
++D خطأ""",
++    },
++    {
++        "q": "Why are dictionaries described as “bags”?",
++        "choices": ["Because they are sorted", "Because they have no order", "Because they use indexes", "Because they store only strings"],
++        "correct": "B",
++        "ex": """The slide states:
++“Dictionaries are like bags - no order.”
++
++الشرح (عربي):
++الإجابة الصحيحة هي B لأن النص يقول:
++“Dictionaries are like bags - no order.”
++يعني القواميس غير مرتبة.
++لذلك:
++A خطأ
++C خطأ
++D خطأ""",
++    },
++    {
++        "q": "How do you access a value in a dictionary?",
++        "choices": ["By index number", "By using a lookup tag (key)", "By position in memory", "By using range()"],
++        "correct": "B",
++        "ex": """The slide states:
++“we index the things we put in the dictionary with a ‘lookup tag’.”
++
++الشرح (عربي):
++الإجابة الصحيحة هي B لأن النص يقول:
++“with a ‘lookup tag’.”
++يعني نصل إلى القيمة باستخدام المفتاح.
++لذلك:
++A خطأ
++C خطأ
++D خطأ""",
++    },
++    {
++        "q": "In this loop, what does Python iterate over? for key in depts:",
++        "choices": [
++            "The values only",
++            "The keys only",
++            "The items as (key, value) pairs",
++            "The last element only",
++        ],
++        "correct": "B",
++        "ex": """The slide states:
++“it goes through all of the keys in the dictionary and looks up the values.”
++
++الشرح (عربي):
++الإجابة الصحيحة هي B لأن النص يقول:
++“it goes through all of the keys in the dictionary.”
++يعني الحلقة تمر على المفاتيح.
++لذلك:
++A خطأ
++C خطأ
++D خطأ""",
++    },
++    {
++        "q": "Which function returns both key and value when iterating over a dictionary?",
++        "choices": ["keys()", "values()", "items()", "pairs()"],
++        "correct": "C",
++        "ex": """The slide shows:
++“for key, value in depts.items(): print(key, value)”
++
++الشرح (عربي):
++الإجابة الصحيحة هي C لأن المثال يقول:
++“for key, value in depts.items()”
++يعني الدالة items() تُرجع المفتاح والقيمة معًا.
++لذلك:
++A تُرجع المفاتيح فقط
++B تُرجع القيم فقط
++D غير موجودة""",
++    },
++    {
++        "q": "Which function removes a specific key and returns its value from a dictionary?",
++        "choices": ["delete()", "remove()", "pop()", "clear()"],
++        "correct": "C",
++        "ex": """The slide shows:
++price = product.pop(\"price\") # Returns 1200
++
++الشرح (عربي):
++الإجابة الصحيحة هي C لأن المثال يقول:
++price = product.pop(\"price\") # Returns 1200
++يعني pop() تحذف المفتاح المحدد وتُرجع قيمته.
++لذلك:
++A غير موجودة
++B غير مستخدمة مع القواميس
++D تمسح كل القاموس""",
++    },
++    {
++        "q": "Which statement deletes a key from a dictionary without returning its value?",
++        "choices": ["pop()", "del", "remove()", "clear()"],
++        "correct": "B",
++        "ex": """The slide shows:
++del product[\"stock\"]
++
++الشرح (عربي):
++الإجابة الصحيحة هي B لأن المثال يقول:
++del product[\"stock\"]
++يعني del تحذف المفتاح فقط بدون إرجاع قيمته.
++لذلك:
++A تُرجع القيمة
++C غير موجودة
++D تمسح القاموس كامل""",
++    },
++    {
++        "q": "Which method removes the last inserted item from a dictionary and returns it?",
++        "choices": ["pop()", "popitem()", "remove()", "clear()"],
++        "correct": "B",
++        "ex": """The slide shows:
++last_key, last_val = product.popitem()
++
++الشرح (عربي):
++الإجابة الصحيحة هي B لأن المثال يقول:
++last_key, last_val = product.popitem()
++يعني popitem() تحذف آخر عنصر وتُرجع المفتاح والقيمة.
++لذلك:
++A تحذف عنصر محدد
++C غير موجودة
++D تمسح القاموس كامل""",
++    },
++    {
++        "q": "Which method removes all items from a dictionary?",
++        "choices": ["delete()", "clear()", "remove()", "pop()"],
++        "correct": "B",
++        "ex": """The slide shows:
++product.clear() # Dictionary is now empty
++
++الشرح (عربي):
++الإجابة الصحيحة هي B لأن المثال يقول:
++product.clear()
++يعني clear() تمسح كل محتويات القاموس.
++لذلك:
++A غير موجودة
++C غير موجودة
++D تحذف عنصر واحد فقط""",
++    },
++    {
++        "q": "How can you convert two lists into a dictionary?",
++        "choices": ["Using dict(list1, list2)", "Using zip() and dict()", "Using merge()", "Using map()"],
++        "correct": "B",
++        "ex": """The slide shows:
++x = dict(zip(year_list, pl_list))
++
++الشرح (عربي):
++الإجابة الصحيحة هي B لأن المثال يقول:
++x = dict(zip(year_list, pl_list))
++يعني نستخدم zip لربط القائمتين ثم نحول الناتج إلى dictionary.
++لذلك:
++A غير صحيح
++C غير موجودة
++D غير مستخدمة لهذا الغرض""",
++    },
++    {
++        "q": "What is a function in Python?",
++        "choices": [
++            "A variable that stores numbers",
++            "Some stored code that we use",
++            "A loop that repeats code",
++            "A type of list",
++        ],
++        "correct": "B",
++        "ex": """The slide states:
++“A function is some stored code that we use. A function takes some input and produces an output.”
++
++الشرح (عربي):
++الإجابة الصحيحة هي B لأن النص يقول:
++“A function is some stored code that we use.”
++يعني الدالة هي كود محفوظ نستخدمه.
++لذلك:
++A خطأ
++C خطأ
++D خطأ""",
++    },
++    {
++        "q": "How do you create a new function in Python?",
++        "choices": ["Using the func keyword", "Using the def keyword", "Using the make keyword", "Using the function keyword"],
++        "correct": "B",
++        "ex": """The slide states:
++“We create a new function using the def keyword.”
++
++الشرح (عربي):
++الإجابة الصحيحة هي B لأن النص يقول:
++“We create a new function using the def keyword.”
++يعني لإنشاء دالة جديدة نستخدم def.
++لذلك:
++A و C و D غير موجودة""",
++    },
++    {
++        "q": "What does the return keyword do in a function?",
++        "choices": ["Prints a value", "Ends the program", "Returns a value to be used by the calling expression", "Deletes variables"],
++        "correct": "C",
++        "ex": """The slide states:
++“The return keyword is used to return a value to be used as the value of the function call.”
++
++الشرح (عربي):
++الإجابة الصحيحة هي C لأن النص يقول:
++“return a value to be used as the value of the function call.”
++يعني return تُرجع قيمة.
++لذلك:
++A خطأ
++B خطأ
++D خطأ""",
++    },
++    {
++        "q": "What is an argument?",
++        "choices": ["A variable inside the function", "A value passed into the function", "The name of the function", "A loop inside the function"],
++        "correct": "B",
++        "ex": """The slide states:
++“An argument is a value we pass into the function as its input.”
++
++الشرح (عربي):
++الإجابة الصحيحة هي B لأن النص يقول:
++“An argument is a value we pass into the function.”
++يعني الـ argument هو قيمة نمررها للدالة.
++لذلك:
++A خطأ
++C خطأ
++D خطأ""",
++    },
++    {
++        "q": "What is a parameter?",
++        "choices": ["A value passed to the function", "A variable used in the function definition", "The result returned from a function", "The function name"],
++        "correct": "B",
++        "ex": """The slide states:
++“A parameter is a variable which we use in the function definition.”
++
++الشرح (عربي):
++الإجابة الصحيحة هي B لأن النص يقول:
++“A parameter is a variable which we use in the function definition.”
++يعني الـ parameter هو متغير داخل تعريف الدالة.
++لذلك:
++A هو argument
++C خطأ
++D خطأ""",
++    },
++    {
++        "q": "What does the *args parameter represent in a function?",
++        "choices": ["A dictionary of arguments", "A tuple of arguments", "A list of arguments", "A single argument"],
++        "correct": "B",
++        "ex": """The slide states:
++“The function will receive a tuple of arguments.”
++
++الشرح (عربي):
++الإجابة الصحيحة هي B لأن النص يقول:
++“The function will receive a tuple of arguments.”
++يعني *args تستقبل القيم على شكل tuple.
++لذلك:
++A خطأ
++C خطأ
++D خطأ""",
++    },
++    {
++        "q": "What does the **kwargs parameter represent?",
++        "choices": ["A tuple of arguments", "A list of arguments", "A dictionary of keyword arguments", "A single argument"],
++        "correct": "C",
++        "ex": """The slide states:
++“This way the function will receive a dictionary of arguments.”
++
++الشرح (عربي):
++الإجابة الصحيحة هي C لأن النص يقول:
++“The function will receive a dictionary of arguments.”
++يعني **kwargs تستقبل القيم على شكل dictionary.
++لذلك:
++A خطأ
++B خطأ
++D خطأ""",
++    },
++    {
++        "q": "What is an iterator?",
++        "choices": [
++            "An object that stores images",
++            "An object that contains a countable number of values and can be iterated upon",
++            "A loop keyword",
++            "A function that prints values",
++        ],
++        "correct": "B",
++        "ex": """The slide states:
++“An iterator is an object that contains a countable number of values… can be iterated upon.”
++
++الشرح (عربي):
++الإجابة الصحيحة هي B لأن النص يقول:
++“An iterator is an object that contains a countable number of values.”
++يعني الـ iterator كائن يحتوي على قيم يمكن المرور عليها.
++لذلك:
++A خطأ
++C خطأ
++D خطأ""",
++    },
++    {
++        "q": "What happens when an iterator reaches the end of its values?",
++        "choices": ["It returns None", "It restarts automatically", "It raises a StopIteration exception", "It prints an error message"],
++        "correct": "C",
++        "ex": """The slide states:
++“When we reach the end… it will raise the StopIteration Exception.”
++
++الشرح (عربي):
++الإجابة الصحيحة هي C لأن النص يقول:
++“it will raise the StopIteration Exception.”
++يعني عند انتهاء القيم يتم إطلاق استثناء StopIteration.
++لذلك:
++A خطأ
++B خطأ
++D خطأ""",
++    },
++    {
++        "q": "What keyword is used in a generator function instead of return?",
++        "choices": ["stop", "yield", "next", "break"],
++        "correct": "B",
++        "ex": """The slide states:
++“It does so with the yield keyword rather than return.”
++
++الشرح (عربي):
++الإجابة الصحيحة هي B لأن النص يقول:
++“with the yield keyword rather than return.”
++يعني الدوال المولدة تستخدم yield بدل return.
++لذلك:
++A خطأ
++C خطأ
++D خطأ""",
++    },
++    {
++        "q": "What is a lambda function?",
++        "choices": [
++            "A large named function",
++            "A small anonymous function with one expression",
++            "A function that must have no arguments",
++            "A function that uses return only",
++        ],
++        "correct": "B",
++        "ex": """The slide states:
++“A lambda function is a small anonymous function… can only have one expression.”
++
++الشرح (عربي):
++الإجابة الصحيحة هي B لأن النص يقول:
++“A lambda function is a small anonymous function… can only have one expression.”
++يعني الـ lambda دالة صغيرة بدون اسم وتحتوي على تعبير واحد فقط.
++لذلك:
++A خطأ
++C خطأ
++D خطأ""",
++    },
++    {
++        "q": "Which syntax is correct for a lambda function?",
++        "choices": ["lambda: a + 10", "lambda a : a + 10", "lambda(a, b)", "def lambda(a):"],
++        "correct": "B",
++        "ex": """The slide states:
++“Syntax : lambda arguments : expression”
++
++الشرح (عربي):
++الإجابة الصحيحة هي B لأن النص يقول:
++“Syntax : lambda arguments : expression”
++يعني الصيغة الصحيحة: lambda a : a + 10
++لذلك:
++A ناقصة argument
++C ناقصة التعبير
++D صيغة خاطئة""",
++    },
++    {
++        "q": "What does the min() and max() functions do?",
++        "choices": ["Sort lists", "Find the lowest and highest value in an iterable", "Convert strings to numbers", "Remove duplicates"],
++        "correct": "B",
++        "ex": """The slide states:
++“The min() and max() functions is used to find the lowest or highest value in an iterable.”
++
++الشرح (عربي):
++الإجابة الصحيحة هي B لأن النص يقول:
++“find the lowest or highest value in an iterable.”
++يعني min() تُرجع أصغر قيمة و max() تُرجع أكبر قيمة.
++لذلك:
++A خطأ
++C خطأ
++D خطأ""",
++    },
++    {
++        "q": "What does math.ceil() do?",
++        "choices": ["Rounds a number downwards", "Rounds a number upwards", "Returns square root", "Returns power of a number"],
++        "correct": "B",
++        "ex": """The slide states:
++“The math.ceil() method rounds a number upwards to its nearest integer.”
++
++الشرح (عربي):
++الإجابة الصحيحة هي B لأن النص يقول:
++“rounds a number upwards.”
++يعني math.ceil() تقرب الرقم للأعلى.
++لذلك:
++A خطأ
++C خطأ
++D خطأ""",
++    },
++    {
++        "q": "What does math.floor() do?",
++        "choices": ["Rounds a number upwards", "Rounds a number downwards", "Finds the square root", "Raises a number to a power"],
++        "correct": "B",
++        "ex": """The slide states:
++“The math.floor() method rounds a number downwards to its nearest integer.”
++
++الشرح (عربي):
++الإجابة الصحيحة هي B لأن النص يقول:
++“rounds a number downwards.”
++يعني math.floor() تقرب الرقم للأسفل.
++لذلك:
++A خطأ
++C خطأ
++D خطأ""",
++    },
++    {
++        "q": "What does the math.sqrt() function return?",
++        "choices": ["The square of a number", "The cube of a number", "The square root of a number", "The absolute value of a number"],
++        "correct": "C",
++        "ex": """The slide states:
++“The math.sqrt() method returns the square root of a number.”
++
++الشرح (عربي):
++الإجابة الصحيحة هي C لأن النص يقول:
++“The math.sqrt() method returns the square root of a number.”
++يعني math.sqrt() تُرجع الجذر التربيعي.
++لذلك:
++A خطأ
++B خطأ
++D خطأ""",
++    },
++    {
++        "q": "What does the pow(x, y) function return?",
++        "choices": ["x divided by y", "x multiplied by y", "x to the power of y", "y to the power of x"],
++        "correct": "C",
++        "ex": """The slide states:
++“The pow(x, y) function returns the value of x to the power of y.”
++
++الشرح (عربي):
++الإجابة الصحيحة هي C لأن النص يقول:
++“returns the value of x to the power of y.”
++يعني pow(x, y) تُحسب x مرفوعة للقوة y.
++لذلك:
++A خطأ
++B خطأ
++D خطأ""",
++    },
++    {
++        "q": "Why do we use try and except in Python?",
++        "choices": ["To make code faster", "To surround dangerous code and handle errors", "To declare variables", "To repeat code"],
++        "correct": "B",
++        "ex": """The slide states:
++“You surround a dangerous section of code with try and except.”
++
++الشرح (عربي):
++الإجابة الصحيحة هي B لأن النص يقول:
++“You surround a dangerous section of code with try and except.”
++يعني نستخدم try/except لمعالجة الأخطاء.
++لذلك:
++A خطأ
++C خطأ
++D خطأ""",
++    },
++    {
++        "q": "What happens if the code inside try works correctly?",
++        "choices": ["The program stops", "The except block is skipped", "The except block always runs", "The program crashes"],
++        "correct": "B",
++        "ex": """The slide states:
++“If the code in the try works – the except is skipped.”
++
++الشرح (عربي):
++الإجابة الصحيحة هي B لأن النص يقول:
++“the except is skipped.”
++يعني إذا الكود داخل try اشتغل بدون خطأ، يتم تجاوز except.
++لذلك:
++A خطأ
++C خطأ
++D خطأ""",
++    },
++    {
++        "q": "What is the main purpose of the assert keyword?",
++        "choices": ["Printing values", "Deleting variables", "Debugging by checking conditions", "Creating loops"],
++        "correct": "C",
++        "ex": """The slide states:
++“checks a given condition… the primary use of the assert keyword is that it’s a debugging tool.”
++
++الشرح (عربي):
++الإجابة الصحيحة هي C لأن النص يقول:
++“the primary use of the assert keyword is that it’s a debugging tool.”
++يعني assert تُستخدم لفحص شرط معين أثناء تصحيح الأخطاء.
++لذلك:
++A خطأ
++B خطأ
++D خطأ""",
++    },
++    {
++        "q": "What does the open() function return?",
++        "choices": ["A list", "A dictionary", "A file handle", "A string"],
++        "correct": "C",
++        "ex": """The slide states:
++“open() returns a ‘file handle’ – a variable used to perform operations on the file.”
++
++الشرح (عربي):
++الإجابة الصحيحة هي C لأن النص يقول:
++“open() returns a ‘file handle’.”
++يعني الدالة open() تُرجع مقبض ملف.
++لذلك:
++A خطأ
++B خطأ
++D خطأ""",
++    },
++    {
++        "q": "Which mode should be used to open a file for reading?",
++        "choices": ["w", "a", "r", "x"],
++        "correct": "C",
++        "ex": """The slide states:
++“should be 'r' if we are planning reading the file.”
++
++الشرح (عربي):
++الإجابة الصحيحة هي C لأن النص يقول:
++“should be 'r' if we are planning reading the file.”
++يعني عند قراءة ملف نستخدم الوضع 'r'.
++لذلك:
++A للكتابة
++B للإضافة
++D غير مذكور""",
++    },
++    {
++        "q": "How can a file handle opened for reading be treated?",
++        "choices": ["As a number", "As a sequence of strings", "As a dictionary", "As a boolean"],
++        "correct": "B",
++        "ex": """The slide states:
++“A file handle open for read can be treated as a sequence of strings.”
++
++الشرح (عربي):
++الإجابة الصحيحة هي B لأن النص يقول:
++“can be treated as a sequence of strings.”
++يعني الملف يُتعامل معه كسلسلة من الأسطر النصية.
++لذلك:
++A خطأ
++C خطأ
++D خطأ""",
++    },
++    {
++        "q": "Which method reads the whole file into a single string?",
++        "choices": ["read()", "readline()", "readlines()", "write()"],
++        "correct": "A",
++        "ex": """The slide shows:
++allfile = fhand.read()
++
++الشرح (عربي):
++الإجابة الصحيحة هي A لأن المثال يقول:
++allfile = fhand.read()
++يعني read() تقرأ الملف كاملًا كنص واحد.
++لذلك:
++B تقرأ سطر واحد
++C تقرأ الملف كسطور داخل قائمة
++D تستخدم للكتابة""",
++    },
++    {
++        "q": "Which mode is used to append new content to a file?",
++        "choices": ["r", "w", "a", "x"],
++        "correct": "C",
++        "ex": """The slide shows:
++open('email.txt','a')
++
++الشرح (عربي):
++الإجابة الصحيحة هي C لأن المثال يستخدم:
++'a'
++يعني الوضع 'a' يُستخدم لإضافة محتوى جديد.
++لذلك:
++A للقراءة
++B للكتابة مع مسح المحتوى
++D غير مستخدم هنا""",
++    },
++    {
++        "q": "Which module must be imported to delete a file in Python?",
++        "choices": ["sys", "re", "os", "math"],
++        "correct": "C",
++        "ex": """The slide states:
++“To delete a file, you must import the os module.”
++
++الشرح (عربي):
++الإجابة الصحيحة هي C لأن النص يقول:
++“To delete a file, you must import the os module.”
++يعني لحذف ملف يجب استيراد os.
++لذلك:
++A خطأ
++B خطأ
++D خطأ""",
++    },
++    {
++        "q": "Which function is used to delete a file?",
++        "choices": ["os.delete()", "os.remove()", "file.remove()", "delete.file()"],
++        "correct": "B",
++        "ex": """The slide states:
++“run its os.remove() function.”
++
++الشرح (عربي):
++الإجابة الصحيحة هي B لأن النص يقول:
++“os.remove() function.”
++يعني الدالة المسؤولة عن حذف الملفات هي os.remove().
++لذلك:
++A غير موجودة
++C غير صحيحة
++D غير موجودة""",
++    },
++    {
++        "q": "Why should you check if a file exists before deleting it?",
++        "choices": ["To speed up the program", "To avoid getting an error", "To copy the file", "To rename the file"],
++        "correct": "B",
++        "ex": """The slide states:
++“To avoid getting an error, you might want to check if the file exists before you try to delete it.”
++
++الشرح (عربي):
++الإجابة الصحيحة هي B لأن النص يقول:
++“To avoid getting an error…”
++يعني نتحقق من وجود الملف حتى لا يحدث خطأ.
++لذلك:
++A خطأ
++C خطأ
++D خطأ""",
++    },
++    {
++        "q": "Why are raw strings used in regular expressions?",
++        "choices": ["To speed up execution", "To avoid confusion while dealing with regex patterns", "To encrypt strings", "To store binary data"],
++        "correct": "B",
++        "ex": """The slide states:
++“To avoid confusion while dealing with regular expressions pattern, the Raw Strings as r'expression' is used.”
++
++الشرح (عربي):
++الإجابة الصحيحة هي B لأن النص يقول:
++“To avoid confusion while dealing with regular expressions pattern.”
++يعني نستخدم raw strings لتسهيل كتابة أنماط الـ regex.
++لذلك:
++A خطأ
++C خطأ
++D خطأ""",
++    },
++    {
++        "q": "What is the difference between re.match() and re.search()?",
++        "choices": [
++            "Both search anywhere in the string",
++            "match() searches anywhere, search() searches only at the beginning",
++            "match() checks only at the beginning, search() checks anywhere",
++            "They work exactly the same",
++        ],
++        "correct": "C",
++        "ex": """The slide states:
++“The match function checks for a match only at the beginning of the string, while search checks for a match anywhere in the string.”
++
++الشرح (عربي):
++الإجابة الصحيحة هي C لأن النص يقول:
++“match … only at the beginning… while search … anywhere in the string.”
++يعني re.match() يفحص بداية النص فقط، وre.search() يفحص أي مكان.
++لذلك:
++A خطأ
++B خطأ
++D خطأ""",
++    },
++    {
++        "q": "What does the re.sub() function do?",
++        "choices": ["Searches for a pattern only", "Replaces all occurrences of a pattern in a string", "Splits a string into parts", "Matches only the beginning of a string"],
++        "correct": "B",
++        "ex": """The slide states:
++“The sub function replaces all occurrences of the RE pattern in string argument with repl.”
++
++الشرح (عربي):
++الإجابة الصحيحة هي B لأن النص يقول:
++“The sub function replaces all occurrences of the RE pattern…”
++يعني re.sub() تستبدل كل التطابقات في النص.
++لذلك:
++A خطأ
++C خطأ
++D خطأ""",
++    },
++    {
++        "q": "What does the pattern \\d represent in regular expressions?",
++        "choices": ["Any character", "A digit (0–9)", "A whitespace", "A word boundary"],
++        "correct": "B",
++        "ex": """The slide shows:
++“\\d - Digit (0-9)”
++
++الشرح (عربي):
++الإجابة الصحيحة هي B لأن النص يقول:
++“\\d - Digit (0-9)”
++يعني \\d تمثل أي رقم من 0 إلى 9.
++لذلك:
++A خطأ
++C خطأ
++D خطأ""",
++    },
++    {
++        "q": "What does the pattern ^ represent in regular expressions?",
++        "choices": ["End of a string", "Beginning of a string", "Any character", "Word boundary"],
++        "correct": "B",
++        "ex": """The slide shows:
++“^ - Beginning of a String”
++
++الشرح (عربي):
++الإجابة الصحيحة هي B لأن النص يقول:
++“^ - Beginning of a String”
++يعني الرمز ^ يدل على بداية النص.
++لذلك:
++A خطأ
++C خطأ
++D خطأ""",
++    },
++    {
++        "q": "What does the pattern $ represent in regular expressions?",
++        "choices": ["Beginning of a string", "End of a string", "Any digit", "One or more characters"],
++        "correct": "B",
++        "ex": """The slide shows:
++“$ - End of a String”
++
++الشرح (عربي):
++الإجابة الصحيحة هي B لأن النص يقول:
++“$ - End of a String”
++يعني الرمز $ يدل على نهاية النص.
++لذلك:
++A خطأ
++C خطأ
++D خطأ""",
++    },
++    {
++        "q": "What does the pattern \\w represent in regular expressions?",
++        "choices": [
++            "Only letters",
++            "Only digits",
++            "Word characters (letters, digits, and underscore)",
++            "Whitespace characters",
++        ],
++        "correct": "C",
++        "ex": """The slide shows:
++“\\w - Word Character (a-z, A-Z, 0-9, _)”
++
++الشرح (عربي):
++الإجابة الصحيحة هي C لأن النص يقول:
++“\\w - Word Character (a-z, A-Z, 0-9, _)”
++يعني \\w تمثل أي حرف أو رقم أو شرطة سفلية.
++لذلك:
++A خطأ
++B خطأ
++D خطأ""",
++    },
++]
++
++conn = sqlite3.connect(DB)
++conn.row_factory = sqlite3.Row
++cur = conn.cursor()
++
++cur.execute("SELECT id FROM subjects WHERE name = ?", (subject_name,))
++row = cur.fetchone()
++if row:
++    subject_id = row["id"]
++else:
++    cur.execute(
++        "INSERT INTO subjects (name, created_at) VALUES (?, ?)",
++        (subject_name, datetime.utcnow().isoformat()),
++    )
++    subject_id = cur.execute(
++        "SELECT id FROM subjects WHERE name = ?", (subject_name,)
++    ).fetchone()[0]
++
++now = datetime.utcnow().isoformat()
++for item in questions:
++    a, b, c, d = item["choices"]
++    cur.execute(
++        """
++        INSERT INTO questions (subject_id, exam_type, question_text, choice_a, choice_b, choice_c, choice_d,
++                               correct_choice, image_path, source, explanation, created_at, updated_at)
++        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
++        """,
++        (subject_id, "both", item["q"], a, b, c, d, item["correct"], None, "ai", item["ex"], now, now),
++    )
++
++conn.commit()
++conn.close()
++print(f"Inserted {len(questions)} AI questions for subject '{subject_name}'.")

@@ -2,35 +2,66 @@
 {% extends "base.html" %}
 {% block content %}
 <section class="card">
-  <div class="subject-header">
+  <div class="page-head">
+    <div class="breadcrumb compact">
+      <a href="/">الرئيسية</a>
+      <span>›</span>
+      {% if source == 'ai' %}
+        <a href="/questions">أسئلة AI</a>
+      {% else %}
+        <a href="/questions">أسئلة سابقة</a>
+        <span>›</span>
+        <span>{{ 'منتصف الفصل' if exam == 'mid' else 'نهائي' if exam == 'final' else 'كلاهما' }}</span>
+      {% endif %}
+      <span class="tag">{{ subject.name }}</span>
+    </div>
+    <a class="btn ghost" href="{% if source == 'ai' %}/subjects?source=ai{% else %}/subjects?source=past&exam={{ exam }}{% endif %}">رجوع للمواد</a>
+  </div>
+  <div class="subject-header clean">
     <h2>{{ subject.name }}</h2>
-    <div class="tabs">
-      <a class="tab {{ 'active' if exam == 'mid' else '' }}" href="/subjects/{{ subject.id }}?exam=mid">منتصف الفصل</a>
-      <a class="tab {{ 'active' if exam == 'final' else '' }}" href="/subjects/{{ subject.id }}?exam=final">نهائي</a>
-      <a class="tab {{ 'active' if exam == 'both' else '' }}" href="/subjects/{{ subject.id }}?exam=both">كلاهما</a>
+    <div class="badges">
+      {% if source == 'ai' %}
+        <span class="badge">أسئلة AI</span>
+      {% else %}
+        <span class="badge">أسئلة سابقة</span>
+        <span class="badge">{{ 'منتصف الفصل' if exam == 'mid' else 'نهائي' if exam == 'final' else 'كلاهما' }}</span>
+      {% endif %}
     </div>
   </div>
   <form class="search" method="get" action="/subjects/{{ subject.id }}">
     <input type="hidden" name="exam" value="{{ exam }}" />
-    <input name="q" placeholder="بحث عن سؤال" value="{{ q }}" />
+    <input type="hidden" name="source" value="{{ source }}" />
+    <div class="search-input">
+      <span class="search-icon">🔎</span>
+      <input name="q" placeholder="ابحث داخل أسئلة {{ subject.name }}…" value="{{ q }}" />
+    </div>
     <button class="btn ghost" type="submit">بحث</button>
   </form>
   <div class="list">
     {% for q in questions %}
-      <a class="question-item" href="/questions/{{ q.id }}">
-        <span>{{ q.question_text or 'سؤال بصيغة صورة' }}</span>
-        <em>
-          {% if q.exam_type == 'mid' %}منتصف الفصل{% elif q.exam_type == 'final' %}نهائي{% else %}كلاهما{% endif %}
-        </em>
+      <a class="question-row" href="/questions/{{ q.id }}">
+        <span class="q-badge">#{{ q.id }}</span>
+        <span class="q-text">{{ q.question_text or 'سؤال بصيغة صورة' }}</span>
+        <span class="q-arrow">›</span>
       </a>
     {% else %}
-      <p>لا توجد أسئلة بعد.</p>
+      <div class="empty-state">
+        <div class="empty-icon">📄</div>
+        <h3>لا توجد أسئلة بعد</h3>
+        <p>جرّب تغيير الفلتر أو ارجع للمواد.</p>
+        <div class="empty-actions">
+          <a class="btn" href="{% if source == 'ai' %}/subjects?source=ai{% else %}/subjects?source=past&exam={{ exam }}{% endif %}">رجوع للمواد</a>
+          {% if user and user.role == 'admin' %}
+            <a class="btn ghost" href="/admin">أضف سؤال الآن</a>
+          {% endif %}
+        </div>
+      </div>
     {% endfor %}
   </div>
   {% if total_pages > 1 %}
   <div class="pagination">
     {% for p in range(1, total_pages + 1) %}
-      <a class="page {{ 'active' if p == page else '' }}" href="/subjects/{{ subject.id }}?exam={{ exam }}&q={{ q }}&page={{ p }}">{{ p }}</a>
+      <a class="page {{ 'active' if p == page else '' }}" href="/subjects/{{ subject.id }}?source={{ source }}&exam={{ exam }}&q={{ q }}&page={{ p }}">{{ p }}</a>
     {% endfor %}
   </div>
   {% endif %}

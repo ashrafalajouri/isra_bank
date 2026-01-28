@@ -1,0 +1,26 @@
+{% set title = "اختيار نوع الامتحان" %}
+{% extends "base.html" %}
+{% block content %}
+<section class="card">
+  <h2>اختر نوع الامتحان</h2>
+  <p class="muted">هذا الاختيار خاص بالأسئلة السابقة فقط.</p>
+  <div class="card-grid">
+    <a class="pick-card" href="/subjects?source=past&exam=mid">
+      <div class="card-icon">📝</div>
+      <h4>منتصف الفصل</h4>
+      <p>أسئلة اختبار منتصف الفصل</p>
+    </a>
+    <a class="pick-card" href="/subjects?source=past&exam=final">
+      <div class="card-icon">✅</div>
+      <h4>نهائي</h4>
+      <p>أسئلة الاختبار النهائي</p>
+    </a>
+    <a class="pick-card" href="/subjects?source=past&exam=both">
+      <div class="card-icon">📚</div>
+      <h4>كلاهما</h4>
+      <p>عرض جميع الأسئلة السابقة</p>
+    </a>
+  </div>
+  <a class="btn ghost" href="/questions">رجوع</a>
+</section>
+{% endblock %}

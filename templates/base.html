@@ -13,6 +13,7 @@
     </div>
     <nav>
       <a href="/">الرئيسية</a>
+      <a href="/questions">الأسئلة</a>
       <a href="/contact">تواصل</a>
       {% if user and user.role == 'admin' %}
         <a href="/admin">الإدارة</a>
@@ -34,7 +35,26 @@
   </main>
 
   <footer class="footer">
-    © بنك الإسراء — Ashraf Alajouri
+    <div class="footer-inner">
+      <div class="footer-social">
+        <div class="footer-title">تابعني على</div>
+        <div class="social-row">
+          <a class="social-btn insta" href="https://www.instagram.com/f0r_g0t" target="_blank" rel="noopener" aria-label="Instagram">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M7 3h10a4 4 0 0 1 4 4v10a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V7a4 4 0 0 1 4-4zm10 2H7a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm-5 3.5A5.5 5.5 0 1 1 6.5 14 5.5 5.5 0 0 1 12 8.5zm0 2A3.5 3.5 0 1 0 15.5 14 3.5 3.5 0 0 0 12 10.5zm5.75-3.1a1.1 1.1 0 1 1-1.1-1.1 1.1 1.1 0 0 1 1.1 1.1z"/>
+            </svg>
+            <span>Instagram</span>
+          </a>
+          <a class="social-btn fb" href="https://www.facebook.com/a078790/" target="_blank" rel="noopener" aria-label="Facebook">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M13.5 9H16l-.5 3h-2v9h-3v-9H8V9h2.5V7.5A3.5 3.5 0 0 1 14 4h2v3h-2a.5.5 0 0 0-.5.5z"/>
+            </svg>
+            <span>Facebook</span>
+          </a>
+        </div>
+      </div>
+      <div class="footer-copy">© بنك الإسراء — Ashraf Alajouri</div>
+    </div>
   </footer>
   <div id="imgModal" class="img-modal hidden" role="dialog" aria-modal="true">
     <span class="img-modal-close" id="imgModalClose">×</span>

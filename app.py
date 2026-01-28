@@ -268,23 +268,55 @@ def require_admin(request: Request):
 @app.get("/", response_class=HTMLResponse)
 def home(request: Request):
     user = get_current_user(request)
-    conn = get_db()
-    subjects = conn.execute("SELECT * FROM subjects ORDER BY name").fetchall()
-    past_questions = conn.execute(
-        "SELECT id, question_text, image_path FROM questions WHERE source = 'past' ORDER BY id DESC LIMIT 8"
-    ).fetchall()
-    ai_questions = conn.execute(
-        "SELECT id, question_text, image_path FROM questions WHERE source = 'ai' ORDER BY id DESC LIMIT 8"
-    ).fetchall()
-    conn.close()
     return templates.TemplateResponse(
         "home.html",
         {
             "request": request,
             "user": user,
+            "flash": request.session.pop("flash", None),
+        },
+    )
+
+
+@app.get("/questions", response_class=HTMLResponse)
+def questions_home(request: Request):
+    user = get_current_user(request)
+    return templates.TemplateResponse(
+        "questions_home.html",
+        {"request": request, "user": user, "flash": request.session.pop("flash", None)},
+    )
+
+
+@app.get("/questions/past", response_class=HTMLResponse)
+def questions_past(request: Request):
+    user = get_current_user(request)
+    return templates.TemplateResponse(
+        "questions_past.html",
+        {"request": request, "user": user, "flash": request.session.pop("flash", None)},
+    )
+
+
+@app.get("/subjects", response_class=HTMLResponse)
+def subjects_list(request: Request, source: str = "past", exam: Optional[str] = None):
+    user = get_current_user(request)
+    if source not in ("past", "ai"):
+        source = "past"
+    if source == "past":
+        if exam not in ("mid", "final", "both"):
+            return RedirectResponse(url="/questions/past", status_code=303)
+    else:
+        exam = None
+    conn = get_db()
+    subjects = conn.execute("SELECT * FROM subjects ORDER BY name").fetchall()
+    conn.close()
+    return templates.TemplateResponse(
+        "subjects_list.html",
+        {
+            "request": request,
+            "user": user,
             "subjects": subjects,
-            "past_questions": past_questions,
-            "ai_questions": ai_questions,
+            "source": source,
+            "exam": exam or "",
             "flash": request.session.pop("flash", None),
         },
     )
@@ -356,7 +388,7 @@ def dashboard(request: Request):
 
 
 @app.get("/subjects/{subject_id}", response_class=HTMLResponse)
-def subject_view(request: Request, subject_id: int, exam: str = "mid", q: Optional[str] = None, page: int = 1):
+def subject_view(request: Request, subject_id: int, exam: Optional[str] = None, source: str = "past", q: Optional[str] = None, page: int = 1):
     user = get_current_user(request)
     conn = get_db()
     subject = conn.execute("SELECT * FROM subjects WHERE id = ?", (subject_id,)).fetchone()
@@ -364,15 +396,23 @@ def subject_view(request: Request, subject_id: int, exam: str = "mid", q: Option
         conn.close()
         return RedirectResponse(url="/", status_code=303)
 
-    if exam not in ("mid", "final", "both"):
-        exam = "mid"
+    if source not in ("past", "ai"):
+        source = "past"
+    if source == "past":
+        if exam not in ("mid", "final", "both"):
+            conn.close()
+            return RedirectResponse(url="/questions/past", status_code=303)
+    else:
+        exam = None
     per_page = 50
     offset = (page - 1) * per_page
     base_query = "FROM questions WHERE subject_id = ?"
     params = [subject_id]
-    if exam != "both":
+    if exam and exam != "both":
         base_query += " AND exam_type = ?"
         params.append(exam)
+    base_query += " AND source = ?"
+    params.append(source)
     if q:
         base_query += " AND question_text LIKE ?"
         params.append(f"%{q}%")
@@ -387,7 +427,7 @@ def subject_view(request: Request, subject_id: int, exam: str = "mid", q: Option
     total_pages = max(1, (total + per_page - 1) // per_page)
     return templates.TemplateResponse(
         "subject.html",
-        {"request": request, "user": user, "subject": subject, "questions": questions, "exam": exam, "q": q or "", "page": page, "total_pages": total_pages, "flash": request.session.pop("flash", None)},
+        {"request": request, "user": user, "subject": subject, "questions": questions, "exam": exam or "", "source": source, "q": q or "", "page": page, "total_pages": total_pages, "flash": request.session.pop("flash", None)},
     )
 
 
@@ -403,12 +443,12 @@ def question_view(request: Request, question_id: int):
     next_q = None
     if q:
         prev_q = conn.execute(
-            "SELECT id FROM questions WHERE subject_id = ? AND exam_type = ? AND id < ? ORDER BY id DESC LIMIT 1",
-            (q["subject_id"], q["exam_type"], q["id"]),
+            "SELECT id FROM questions WHERE subject_id = ? AND exam_type = ? AND source = ? AND id < ? ORDER BY id DESC LIMIT 1",
+            (q["subject_id"], q["exam_type"], q["source"], q["id"]),
         ).fetchone()
         next_q = conn.execute(
-            "SELECT id FROM questions WHERE subject_id = ? AND exam_type = ? AND id > ? ORDER BY id ASC LIMIT 1",
-            (q["subject_id"], q["exam_type"], q["id"]),
+            "SELECT id FROM questions WHERE subject_id = ? AND exam_type = ? AND source = ? AND id > ? ORDER BY id ASC LIMIT 1",
+            (q["subject_id"], q["exam_type"], q["source"], q["id"]),
         ).fetchone()
     conn.close()
     if not q:
@@ -434,12 +474,12 @@ def answer_question(request: Request, question_id: int, choice: str = Form(...))
 
     if not user:
         prev_q = conn.execute(
-            "SELECT id FROM questions WHERE subject_id = ? AND exam_type = ? AND id < ? ORDER BY id DESC LIMIT 1",
-            (q["subject_id"], q["exam_type"], q["id"]),
+            "SELECT id FROM questions WHERE subject_id = ? AND exam_type = ? AND source = ? AND id < ? ORDER BY id DESC LIMIT 1",
+            (q["subject_id"], q["exam_type"], q["source"], q["id"]),
         ).fetchone()
         next_q = conn.execute(
-            "SELECT id FROM questions WHERE subject_id = ? AND exam_type = ? AND id > ? ORDER BY id ASC LIMIT 1",
-            (q["subject_id"], q["exam_type"], q["id"]),
+            "SELECT id FROM questions WHERE subject_id = ? AND exam_type = ? AND source = ? AND id > ? ORDER BY id ASC LIMIT 1",
+            (q["subject_id"], q["exam_type"], q["source"], q["id"]),
         ).fetchone()
         conn.close()
         attempt = {"is_correct": is_correct, "chosen_choice": choice}
@@ -487,12 +527,12 @@ def question_result(request: Request, question_id: int):
         conn.close()
         return RedirectResponse(url="/", status_code=303)
     prev_q = conn.execute(
-        "SELECT id FROM questions WHERE subject_id = ? AND exam_type = ? AND id < ? ORDER BY id DESC LIMIT 1",
-        (q["subject_id"], q["exam_type"], q["id"]),
+        "SELECT id FROM questions WHERE subject_id = ? AND exam_type = ? AND source = ? AND id < ? ORDER BY id DESC LIMIT 1",
+        (q["subject_id"], q["exam_type"], q["source"], q["id"]),
     ).fetchone()
     next_q = conn.execute(
-        "SELECT id FROM questions WHERE subject_id = ? AND exam_type = ? AND id > ? ORDER BY id ASC LIMIT 1",
-        (q["subject_id"], q["exam_type"], q["id"]),
+        "SELECT id FROM questions WHERE subject_id = ? AND exam_type = ? AND source = ? AND id > ? ORDER BY id ASC LIMIT 1",
+        (q["subject_id"], q["exam_type"], q["source"], q["id"]),
     ).fetchone()
     attempt = None
     if user:
@@ -567,6 +607,19 @@ def admin_home(request: Request):
         return admin
     conn = get_db()
     subjects = conn.execute("SELECT * FROM subjects ORDER BY name").fetchall()
+    subject_counts = conn.execute(
+        """
+        SELECT s.id, COUNT(q.id) AS qcount
+        FROM subjects s
+        LEFT JOIN questions q ON q.subject_id = s.id
+        GROUP BY s.id
+        """
+    ).fetchall()
+    subject_count_map = {row["id"]: row["qcount"] for row in subject_counts}
+    total_questions = conn.execute("SELECT COUNT(*) AS c FROM questions").fetchone()["c"]
+    total_subjects = conn.execute("SELECT COUNT(*) AS c FROM subjects").fetchone()["c"]
+    new_suggestions = conn.execute("SELECT COUNT(*) AS c FROM suggestions WHERE status = 'new'").fetchone()["c"]
+    new_reports = conn.execute("SELECT COUNT(*) AS c FROM reports WHERE status = 'new'").fetchone()["c"]
     suggestions = conn.execute("SELECT * FROM suggestions ORDER BY created_at DESC").fetchall()
     reports = conn.execute(
         "SELECT r.*, q.question_text FROM reports r JOIN questions q ON q.id = r.question_id ORDER BY r.created_at DESC"
@@ -577,7 +630,20 @@ def admin_home(request: Request):
     conn.close()
     return templates.TemplateResponse(
         "admin.html",
-        {"request": request, "user": admin, "subjects": subjects, "suggestions": suggestions, "reports": reports, "questions": questions, "flash": request.session.pop("flash", None)},
+        {
+            "request": request,
+            "user": admin,
+            "subjects": subjects,
+            "subject_count_map": subject_count_map,
+            "total_questions": total_questions,
+            "total_subjects": total_subjects,
+            "new_suggestions": new_suggestions,
+            "new_reports": new_reports,
+            "suggestions": suggestions,
+            "reports": reports,
+            "questions": questions,
+            "flash": request.session.pop("flash", None),
+        },
     )
 
 

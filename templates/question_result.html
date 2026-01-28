@@ -1,35 +1,71 @@
-﻿{% set title = "نتيجة السؤال" %}
+{% set title = "نتيجة السؤال" %}
 {% extends "base.html" %}
 {% block content %}
-<section class="card">
-  <h2>نتيجة السؤال</h2>
-  {% if q.image_path %}
-    <img class="question-image" src="/static/{{ q.image_path }}" alt="صورة السؤال" />
-  {% endif %}
-  {% if q.question_text %}
-    <p class="question-text">{{ q.question_text }}</p>
-  {% endif %}
-  {% if attempt %}
-    {% if attempt.is_correct == 1 %}
-      <div class="alert success">إجابة صحيحة ✅</div>
-    {% else %}
-      <div class="alert error">إجابة خاطئة ❌</div>
-    {% endif %}
-    <p>الإجابة الصحيحة: <strong>{{ q.correct_choice }}</strong></p>
-    {% if attempt.is_correct == 0 and q.explanation %}
-      <p class="explain">{{ q.explanation }}</p>
-    {% endif %}
-  {% else %}
-    <p>لا توجد محاولة حتى الآن.</p>
-  {% endif %}
-  <div class="nav-links">
-    <a class="btn" href="/questions/{{ q.id }}">عودة للسؤال</a>
-    {% if prev_id %}
-      <a class="btn ghost" href="/questions/{{ prev_id }}">السؤال السابق</a>
-    {% endif %}
-    {% if next_id %}
-      <a class="btn ghost" href="/questions/{{ next_id }}">السؤال التالي</a>
-    {% endif %}
+<section class="question-shell">
+  <div class="question-head">
+    <div class="breadcrumb compact">
+      <a href="/">الرئيسية</a>
+      <span>›</span>
+      {% if q.source == 'ai' %}
+        <span>أسئلة AI</span>
+      {% else %}
+        <span>أسئلة سابقة</span>
+        <span>›</span>
+        <span>{% if q.exam_type == 'mid' %}منتصف الفصل{% elif q.exam_type == 'final' %}نهائي{% else %}كلاهما{% endif %}</span>
+      {% endif %}
+    </div>
+    <a class="btn ghost" href="{% if q.source == 'ai' %}/subjects?source=ai{% else %}/subjects?source=past&exam={{ q.exam_type }}{% endif %}">رجوع للقائمة</a>
+  </div>
+
+  <div class="subject-header clean">
+    <h2>{{ q.subject_name }}</h2>
+    <div class="badges">
+      {% if q.source == 'ai' %}
+        <span class="badge">أسئلة AI</span>
+      {% else %}
+        <span class="badge">أسئلة سابقة</span>
+        <span class="badge">{% if q.exam_type == 'mid' %}منتصف الفصل{% elif q.exam_type == 'final' %}نهائي{% else %}كلاهما{% endif %}</span>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="question-grid">
+    <div class="card question-card">
+      {% if q.image_path %}
+        <img class="question-image" src="/static/{{ q.image_path }}" alt="صورة السؤال" />
+      {% endif %}
+      {% if q.question_text %}
+        <p class="question-text">{{ q.question_text }}</p>
+      {% endif %}
+    </div>
+
+    <div class="card answer-card">
+      <h3>النتيجة</h3>
+      {% if attempt %}
+        {% if attempt.is_correct == 1 %}
+          <div class="result-box success">✅ إجابتك صحيحة</div>
+        {% else %}
+          <div class="result-box error">❌ إجابتك خاطئة — الإجابة الصحيحة: {{ q.correct_choice }}</div>
+        {% endif %}
+        {% if attempt.is_correct == 0 and q.explanation %}
+          <details class="explain-toggle">
+            <summary>عرض الشرح</summary>
+            <p class="explain-text">{{ q.explanation }}</p>
+          </details>
+        {% endif %}
+      {% else %}
+        <div class="result-box">لا توجد محاولة حتى الآن.</div>
+      {% endif %}
+      <div class="answer-actions">
+        <a class="btn" href="/questions/{{ q.id }}">عودة للسؤال</a>
+        {% if prev_id %}
+          <a class="btn ghost" href="/questions/{{ prev_id }}">السؤال السابق</a>
+        {% endif %}
+        {% if next_id %}
+          <a class="btn ghost" href="/questions/{{ next_id }}">السؤال التالي</a>
+        {% endif %}
+      </div>
+    </div>
   </div>
 </section>
 {% endblock %}

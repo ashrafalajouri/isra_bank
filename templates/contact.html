@@ -1,54 +1,141 @@
-﻿{% set title = "تواصل معنا" %}
+{% set title = "تواصل واقتراحات" %}
 {% extends "base.html" %}
 {% block content %}
+<section class="card">
+  <h2>تواصل واقتراحات</h2>
+  <p class="muted">تم اعتماد التواصل عبر البريد فقط لسهولة المتابعة.</p>
+  <p class="muted small">إذا ما عندك برنامج بريد، استخدم زر إرسال عبر الويب أو زر نسخ القالب.</p>
+</section>
+
 <section class="grid two">
   <div class="card">
     <h2>اقتراح سؤال جديد</h2>
-    <form method="post" action="/contact/suggest" class="form">
-      <label>المادة</label>
-      <select name="subject_id">
-        <option value="">--</option>
-        {% for s in subjects %}
-          <option value="{{ s.id }}">{{ s.name }}</option>
-        {% endfor %}
-      </select>
-      <label>أو اكتب اسم مادة غير موجودة</label>
-      <input name="subject_name" />
-      <label>نوع الامتحان</label>
-      <select name="exam_type">
-        <option value="mid">منتصف الفصل</option>
-        <option value="final">نهائي</option>
-        <option value="both">كلاهما</option>
-      </select>
-      <label>نص السؤال</label>
-      <textarea name="question_text"></textarea>
-      <label>الخيار A</label>
-      <input name="choice_a" />
-      <label>الخيار B</label>
-      <input name="choice_b" />
-      <label>الخيار C</label>
-      <input name="choice_c" />
-      <label>الخيار D</label>
-      <input name="choice_d" />
-      <label>الإجابة الصحيحة</label>
-      <select name="proposed_correct_choice">
-        <option value="A">A</option>
-        <option value="B">B</option>
-        <option value="C">C</option>
-        <option value="D">D</option>
-      </select>
-      <label>شرح (اختياري)</label>
-      <textarea name="proposed_explanation"></textarea>
-      <button class="btn" type="submit">إرسال الاقتراح</button>
-    </form>
+    <p class="muted">إذا عندك سؤال جديد من الامتحانات أو سؤال ممتاز، ابعثه لنا بالإيميل مع الإجابة.</p>
+    <div class="btn-row">
+      <a class="btn" id="suggestMailto" href="mailto:ashrafalajouri@gmail.com?subject=%D8%A7%D9%82%D8%AA%D8%B1%D8%A7%D8%AD%20%D8%B3%D8%A4%D8%A7%D9%84%20%D8%AC%D8%AF%D9%8A%D8%AF%20%E2%80%94%20%D8%A8%D9%86%D9%83%20%D8%A7%D9%84%D8%A5%D8%B3%D8%B1%D8%A7%D8%A1&body=%D8%A7%D9%84%D8%B3%D9%84%D8%A7%D9%85%20%D8%B9%D9%84%D9%8A%D9%83%D9%85%D8%8C%0A%D9%87%D8%B0%D8%A7%20%D8%A7%D9%82%D8%AA%D8%B1%D8%A7%D8%AD%20%D8%B3%D8%A4%D8%A7%D9%84%20%D8%AC%D8%AF%D9%8A%D8%AF%20%D9%84%D8%A5%D8%B6%D8%A7%D9%81%D8%AA%D9%87%20%D8%A5%D9%84%D9%89%20%D8%A8%D9%86%D9%83%20%D8%A7%D9%84%D8%A5%D8%B3%D8%B1%D8%A7%D8%A1%3A%0A%0A%D8%A7%D9%84%D9%85%D8%A7%D8%AF%D8%A9%3A%0A%D8%A7%D9%84%D9%86%D9%88%D8%B9%3A%20(%D8%A3%D8%B3%D8%A6%D9%84%D8%A9%20%D8%B3%D8%A7%D8%A8%D9%82%D8%A9%20/%20%D8%A3%D8%B3%D8%A6%D9%84%D8%A9%20AI)%0A%D8%A7%D9%84%D8%A7%D9%85%D8%AA%D8%AD%D8%A7%D9%86%3A%20(Mid%20/%20Final%20/%20Both)%20%5B%D9%81%D9%82%D8%B7%20%D8%A5%D8%B0%D8%A7%20%D8%A3%D8%B3%D8%A6%D9%84%D8%A9%20%D8%B3%D8%A7%D8%A8%D9%82%D8%A9%5D%0A%D9%86%D8%B5%20%D8%A7%D9%84%D8%B3%D8%A4%D8%A7%D9%84%3A%0A(%D8%B6%D8%B9%20%D8%A7%D9%84%D8%B3%D8%A4%D8%A7%D9%84%20%D9%87%D9%86%D8%A7%20%D8%A3%D9%88%20%D8%A7%D8%B1%D9%81%D9%82%20%D8%B5%D9%88%D8%B1%D8%A9)%0A%0A%D8%A7%D9%84%D8%AE%D9%8A%D8%A7%D8%B1%D8%A7%D8%AA%3A%0AA)%0AB)%0AC)%0AD)%0A%0A%D8%A7%D9%84%D8%A5%D8%AC%D8%A7%D8%A8%D8%A9%20%D8%A7%D9%84%D8%B5%D8%AD%D9%8A%D8%AD%D8%A9%3A%20(A/B/C/D)%0A%D8%B4%D8%B1%D8%AD%20%D9%85%D8%AE%D8%AA%D8%B5%D8%B1%20(%D8%A7%D8%AE%D8%AA%D9%8A%D8%A7%D8%B1%D9%8A)%3A%0A%0A%D9%85%D9%84%D8%A7%D8%AD%D8%B8%D8%A7%D8%AA%20%D8%A5%D8%B6%D8%A7%D9%81%D9%8A%D8%A9%3A%0A(%D8%A5%D9%86%20%D9%88%D8%AC%D8%AF%D8%AA)%0A%0A%D8%B4%D9%83%D8%B1%D8%A7%D9%8B%20%D9%84%D9%83%D9%85.">إرسال اقتراح عبر البريد</a>
+      <a class="btn ghost" id="suggestWeb" target="_blank" rel="noopener">إرسال عبر الويب</a>
+      <button class="btn ghost" type="button" data-copy="suggest">نسخ القالب</button>
+    </div>
+    <p class="muted small">سيتم فتح البريد أو نسخ القالب تلقائياً.</p>
   </div>
   <div class="card">
-    <h2>رسالة عامة</h2>
-    <form method="post" action="/contact/message" class="form">
-      <label>الرسالة</label>
-      <textarea name="message" required></textarea>
-      <button class="btn ghost" type="submit">إرسال</button>
-    </form>
+    <h2>الإبلاغ عن خطأ</h2>
+    <p class="muted">إذا لاحظت خطأ في سؤال موجود بالموقع، ابعث التفاصيل.</p>
+    <div class="btn-row">
+      <a class="btn" id="reportMailto" href="mailto:ashrafalajouri@gmail.com?subject=%D8%A8%D9%84%D8%A7%D8%BA%20%D8%AE%D8%B7%D8%A3%20%D9%81%D9%8A%20%D8%B3%D8%A4%D8%A7%D9%84%20%E2%80%94%20%D8%A8%D9%86%D9%83%20%D8%A7%D9%84%D8%A5%D8%B3%D8%B1%D8%A7%D8%A1&body=%D8%A7%D9%84%D8%B3%D9%84%D8%A7%D9%85%20%D8%B9%D9%84%D9%8A%D9%83%D9%85%D8%8C%0A%D8%A3%D8%A8%D9%84%D8%BA%20%D8%B9%D9%86%20%D8%AE%D8%B7%D8%A3%20%D9%81%D9%8A%20%D8%B3%D8%A4%D8%A7%D9%84%20%D8%AF%D8%A7%D8%AE%D9%84%20%D8%A8%D9%86%D9%83%20%D8%A7%D9%84%D8%A5%D8%B3%D8%B1%D8%A7%D8%A1%3A%0A%0A%D8%A7%D9%84%D9%85%D8%A7%D8%AF%D8%A9%3A%0A%D9%86%D9%88%D8%B9%20%D8%A7%D9%84%D8%A3%D8%B3%D8%A6%D9%84%D8%A9%3A%20(%D8%A3%D8%B3%D8%A6%D9%84%D8%A9%20%D8%B3%D8%A7%D8%A8%D9%82%D8%A9%20/%20%D8%A3%D8%B3%D8%A6%D9%84%D8%A9%20AI)%0A%D8%A7%D9%84%D8%A7%D9%85%D8%AA%D8%AD%D8%A7%D9%86%3A%20(Mid%20/%20Final)%20%5B%D8%A5%D8%B0%D8%A7%20%D9%8A%D9%86%D8%B7%D8%A8%D9%82%5D%0A%D8%B1%D9%82%D9%85%20%D8%A7%D9%84%D8%B3%D8%A4%D8%A7%D9%84%20%D8%A3%D9%88%20%D8%B1%D8%A7%D8%A8%D8%B7%20%D8%A7%D9%84%D8%B5%D9%81%D8%AD%D8%A9%3A%0A(%D8%A7%D9%86%D8%B3%D8%AE%20%D8%A7%D9%84%D8%B1%D8%A7%D8%A8%D8%B7%20%D9%87%D9%86%D8%A7)%0A%0A%D9%88%D8%B5%D9%81%20%D8%A7%D9%84%D8%AE%D8%B7%D8%A3%3A%0A(%D8%A7%D9%83%D8%AA%D8%A8%20%D8%A7%D9%84%D9%85%D8%B4%D9%83%D9%84%D8%A9%20%D8%A8%D8%A7%D9%84%D8%AA%D9%81%D8%B5%D9%8A%D9%84)%0A%0A%D8%A7%D9%84%D8%A5%D8%AC%D8%A7%D8%A8%D8%A9%20%D8%A7%D9%84%D8%B5%D8%AD%D9%8A%D8%AD%D8%A9%20%D8%A7%D9%84%D9%85%D9%82%D8%AA%D8%B1%D8%AD%D8%A9%20(%D8%A5%D9%86%20%D9%88%D8%AC%D8%AF%D8%AA)%3A%20(A/B/C/D)%0A%D8%B4%D8%B1%D8%AD/%D8%AA%D8%B5%D8%AD%D9%8A%D8%AD%20%D9%85%D9%82%D8%AA%D8%B1%D8%AD%20(%D8%A7%D8%AE%D8%AA%D9%8A%D8%A7%D8%B1%D9%8A)%3A%0A%0A%D8%B4%D9%83%D8%B1%D8%A7%D9%8B%20%D9%84%D9%83%D9%85.">إرسال بلاغ عبر البريد</a>
+      <a class="btn ghost" id="reportWeb" target="_blank" rel="noopener">إرسال عبر الويب</a>
+      <button class="btn ghost" type="button" data-copy="report">نسخ القالب</button>
+    </div>
+    <p class="muted small">سيتم فتح البريد أو نسخ القالب تلقائياً.</p>
   </div>
 </section>
+
+<section class="card narrow">
+  <h2>رسالة عامة</h2>
+  <p class="muted">لأي استفسار عام، تواصل معنا عبر البريد.</p>
+  <div class="btn-row">
+    <a class="btn" id="generalMailto" href="mailto:ashrafalajouri@gmail.com?subject=%D8%A7%D8%B3%D8%AA%D9%81%D8%B3%D8%A7%D8%B1%20%D8%B9%D8%A7%D9%85%20%E2%80%94%20%D8%A8%D9%86%D9%83%20%D8%A7%D9%84%D8%A5%D8%B3%D8%B1%D8%A7%D8%A1&body=%D8%A7%D9%84%D8%B3%D9%84%D8%A7%D9%85%20%D8%B9%D9%84%D9%8A%D9%83%D9%85%D8%8C%0A%D8%B9%D9%86%D8%AF%D9%8A%20%D8%A7%D8%B3%D8%AA%D9%81%D8%B3%D8%A7%D8%B1%20%D8%A8%D8%AE%D8%B5%D9%88%D8%B5%3A%20...%0A">إرسال رسالة عبر البريد</a>
+    <a class="btn ghost" id="generalWeb" target="_blank" rel="noopener">إرسال عبر الويب</a>
+    <button class="btn ghost" type="button" data-copy="general">نسخ القالب</button>
+  </div>
+  <p class="muted small">سيتم فتح البريد أو نسخ القالب تلقائياً.</p>
+</section>
+
+<section class="card narrow">
+  <h2>حساباتي الرسمية</h2>
+  <p class="muted">تابعني على منصات التواصل.</p>
+  <div class="social-row">
+    <a class="social-btn insta" href="https://www.instagram.com/f0r_g0t" target="_blank" rel="noopener" aria-label="Instagram">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M7 3h10a4 4 0 0 1 4 4v10a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V7a4 4 0 0 1 4-4zm10 2H7a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm-5 3.5A5.5 5.5 0 1 1 6.5 14 5.5 5.5 0 0 1 12 8.5zm0 2A3.5 3.5 0 1 0 15.5 14 3.5 3.5 0 0 0 12 10.5zm5.75-3.1a1.1 1.1 0 1 1-1.1-1.1 1.1 1.1 0 0 1 1.1 1.1z"/>
+      </svg>
+      <span>Instagram</span>
+    </a>
+    <a class="social-btn fb" href="https://www.facebook.com/a078790/" target="_blank" rel="noopener" aria-label="Facebook">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M13.5 9H16l-.5 3h-2v9h-3v-9H8V9h2.5V7.5A3.5 3.5 0 0 1 14 4h2v3h-2a.5.5 0 0 0-.5.5z"/>
+      </svg>
+      <span>Facebook</span>
+    </a>
+  </div>
+</section>
+
+<script>
+  const email = "ashrafalajouri@gmail.com";
+  const templates = {
+    suggest: {
+      subject: "اقتراح سؤال جديد — بنك الإسراء",
+      body: `السلام عليكم،
+هذا اقتراح سؤال جديد لإضافته إلى بنك الإسراء:
+
+المادة:
+النوع: (أسئلة سابقة / أسئلة AI)
+الامتحان: (Mid / Final / Both) [فقط إذا أسئلة سابقة]
+نص السؤال:
+(ضع السؤال هنا أو ارفق صورة)
+
+الخيارات:
+A)
+B)
+C)
+D)
+
+الإجابة الصحيحة: (A/B/C/D)
+شرح مختصر (اختياري):
+
+ملاحظات إضافية:
+(إن وجدت)
+
+شكراً لكم.`
+    },
+    report: {
+      subject: "بلاغ خطأ في سؤال — بنك الإسراء",
+      body: `السلام عليكم،
+أبلغ عن خطأ في سؤال داخل بنك الإسراء:
+
+المادة:
+نوع الأسئلة: (أسئلة سابقة / أسئلة AI)
+الامتحان: (Mid / Final) [إذا ينطبق]
+رقم السؤال أو رابط الصفحة:
+(انسخ الرابط هنا)
+
+وصف الخطأ:
+(اكتب المشكلة بالتفصيل)
+
+الإجابة الصحيحة المقترحة (إن وجدت): (A/B/C/D)
+شرح/تصحيح مقترح (اختياري):
+
+شكراً لكم.`
+    },
+    general: {
+      subject: "استفسار عام — بنك الإسراء",
+      body: `السلام عليكم،
+عندي استفسار بخصوص: ...
+`
+    }
+  };
+
+  const makeGmailLink = (subject, body) =>
+    `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(email)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+
+  document.getElementById("suggestWeb").href = makeGmailLink(templates.suggest.subject, templates.suggest.body);
+  document.getElementById("reportWeb").href = makeGmailLink(templates.report.subject, templates.report.body);
+  document.getElementById("generalWeb").href = makeGmailLink(templates.general.subject, templates.general.body);
+
+  document.querySelectorAll("[data-copy]").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const key = btn.getAttribute("data-copy");
+      const t = templates[key];
+      const text = `الموضوع: ${t.subject}\n\n${t.body}`;
+      try {
+        await navigator.clipboard.writeText(text);
+        btn.textContent = "تم النسخ";
+        setTimeout(() => (btn.textContent = "نسخ القالب"), 1500);
+      } catch (e) {
+        alert("لم يتم النسخ تلقائياً، انسخ النص يدويًا من النافذة التالية.");
+        prompt("انسخ القالب:", text);
+      }
+    });
+  });
+</script>
 {% endblock %}

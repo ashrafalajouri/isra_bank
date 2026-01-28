@@ -1,128 +1,242 @@
-﻿{% set title = "الإدارة" %}
+{% set title = "لوحة الإدارة" %}
 {% extends "base.html" %}
 {% block content %}
 <link rel="stylesheet" href="https://unpkg.com/cropperjs@1.6.2/dist/cropper.min.css">
-<section class="card">
-  <h2>إدارة المواد</h2>
-  <form method="post" action="/admin/subjects/create" class="form inline">
-    <input name="name" placeholder="اسم المادة" required />
-    <button class="btn" type="submit">إضافة</button>
-  </form>
-  <div class="list">
-    {% for s in subjects %}
-      <div class="row">
-        <span>{{ s.name }}</span>
-        <form method="post" action="/admin/subjects/{{ s.id }}/delete">
-          <button class="btn ghost" type="submit">حذف</button>
-        </form>
-      </div>
-    {% else %}
-      <p>لا توجد مواد بعد.</p>
-    {% endfor %}
+<section class="admin-head">
+  <div>
+    <h2>لوحة الإدارة</h2>
+    <p class="muted">إدارة المواد والأسئلة والتقارير</p>
+  </div>
+  {% if flash %}
+    <div class="alert">{{ flash }}</div>
+  {% endif %}
+</section>
+
+<section class="stats-row">
+  <div class="stat-card">
+    <span class="stat-label">عدد المواد</span>
+    <strong>{{ total_subjects }}</strong>
+  </div>
+  <div class="stat-card">
+    <span class="stat-label">عدد الأسئلة</span>
+    <strong>{{ total_questions }}</strong>
+  </div>
+  <div class="stat-card">
+    <span class="stat-label">اقتراحات جديدة</span>
+    <strong>{{ new_suggestions }}</strong>
+  </div>
+  <div class="stat-card">
+    <span class="stat-label">بلاغات جديدة</span>
+    <strong>{{ new_reports }}</strong>
   </div>
 </section>
 
-<section class="card">
-  <h2>إضافة سؤال</h2>
-  <form method="post" action="/admin/questions/create" class="form" enctype="multipart/form-data">
-    <label>المادة</label>
-    <select name="subject_id" required>
+<div class="tabs">
+  <button class="tab-btn active" data-tab="subjects">المواد</button>
+  <button class="tab-btn" data-tab="questions">الأسئلة</button>
+  <button class="tab-btn" data-tab="suggestions">اقتراحات الطلاب</button>
+  <button class="tab-btn" data-tab="reports">بلاغات الأخطاء</button>
+  <button class="tab-btn" data-tab="csv">استيراد/تصدير</button>
+</div>
+
+<section class="tab-panel active" id="tab-subjects">
+  <div class="card">
+    <h3>إضافة مادة</h3>
+    <form method="post" action="/admin/subjects/create" class="form inline">
+      <input name="name" placeholder="اسم المادة" required />
+      <button class="btn" type="submit">إضافة</button>
+    </form>
+  </div>
+
+  <div class="card">
+    <h3>المواد</h3>
+    {% if subjects %}
+    <div class="table">
+      <div class="table-row head subjects-row">
+        <span>اسم المادة</span>
+        <span>عدد الأسئلة</span>
+        <span>إجراءات</span>
+      </div>
       {% for s in subjects %}
-        <option value="{{ s.id }}">{{ s.name }}</option>
-      {% endfor %}
-    </select>
-    <label>نوع الامتحان</label>
-    <select name="exam_type">
-      <option value="mid">منتصف الفصل</option>
-      <option value="final">نهائي</option>
-      <option value="both">كلاهما</option>
-    </select>
-    <label>مصدر السؤال</label>
-    <select name="source">
-      <option value="past">أسئلة امتحانات سابقة</option>
-      <option value="ai">أسئلة مولدة بالذكاء الاصطناعي</option>
-    </select>
-    <label>نص السؤال (اختياري إذا كانت الصورة موجودة)</label>
-    <textarea name="question_text"></textarea>
-    <label>صورة السؤال (اختياري)</label>
-    <input type="file" id="imageInputCreate" name="image" accept="image/*" />
-    <div id="cropAreaCreate" class="crop-area hidden">
-      <img id="cropImageCreate" alt="قص الصورة" />
-      <div class="crop-actions">
-        <button class="btn ghost" type="button" id="applyCropCreate">قص واعتماد</button>
-        <button class="btn ghost" type="button" id="resetCropCreate">إلغاء</button>
-      </div>
-    </div>
-    <label>الخيار A</label>
-    <input name="choice_a" required />
-    <label>الخيار B</label>
-    <input name="choice_b" required />
-    <label>الخيار C</label>
-    <input name="choice_c" required />
-    <label>الخيار D</label>
-    <input name="choice_d" required />
-    <label>الإجابة الصحيحة</label>
-    <select name="correct_choice">
-      <option value="A">A</option>
-      <option value="B">B</option>
-      <option value="C">C</option>
-      <option value="D">D</option>
-    </select>
-    <label>شرح (اختياري)</label>
-    <textarea name="explanation"></textarea>
-    <button class="btn" type="submit">إضافة السؤال</button>
-  </form>
-</section>
-
-<section class="card">
-  <h2>الأسئلة الأخيرة</h2>
-  <div class="list">
-    {% for q in questions %}
-      <div class="row">
-        <span>{{ q.subject_name }} — {{ q.question_text or 'سؤال بصيغة صورة' }} ({{ 'سابق' if q.source == 'past' else 'AI' }})</span>
-        <div class="actions">
-          <a class="btn ghost" href="/admin/questions/{{ q.id }}/edit">تعديل</a>
-          <form method="post" action="/admin/questions/{{ q.id }}/delete">
-            <button class="btn ghost" type="submit">حذف</button>
+      <div class="table-row subjects-row">
+        <span>{{ s.name }}</span>
+        <span>{{ subject_count_map.get(s.id, 0) }}</span>
+        <span class="actions">
+          <form method="post" action="/admin/subjects/{{ s.id }}/delete" onsubmit="return confirm('تأكيد حذف المادة؟')">
+            <button class="btn ghost danger" type="submit">حذف</button>
           </form>
-        </div>
+        </span>
       </div>
+      {% endfor %}
+    </div>
     {% else %}
-      <p>لا توجد أسئلة بعد.</p>
-    {% endfor %}
+      <div class="empty-state">
+        <div class="empty-icon">📘</div>
+        <h3>لا توجد مواد بعد</h3>
+        <p>ابدأ بإضافة مادة جديدة.</p>
+      </div>
+    {% endif %}
   </div>
 </section>
 
-<section class="card">
-  <h2>اقتراحات الطلاب</h2>
-  <div class="list">
-    {% for s in suggestions %}
-      <div class="item">
-        <div class="row">
-          <strong>#{{ s.id }}</strong>
-          <span class="badge">{{ s.status }}</span>
+<section class="tab-panel" id="tab-questions">
+  <div class="card">
+    <h3>إضافة سؤال</h3>
+    <form method="post" action="/admin/questions/create" class="form" enctype="multipart/form-data" id="addQuestionForm">
+      <div class="grid two">
+        <div>
+          <label>المادة</label>
+          <select name="subject_id" required>
+            {% for s in subjects %}
+              <option value="{{ s.id }}">{{ s.name }}</option>
+            {% endfor %}
+          </select>
         </div>
-        {% if s.type == 'question' %}
-          <p>{{ s.question_text or 'سؤال بصيغة صورة' }}</p>
-          <p class="muted">نوع الامتحان: {{ s.exam_type }}</p>
-          {% if s.subject_name %}
-            <p class="muted">المادة المقترحة: {{ s.subject_name }}</p>
-          {% endif %}
-          {% if s.image_path %}
-            <img class="question-image" src="/static/{{ s.image_path }}" alt="صورة الاقتراح" />
-          {% endif %}
-          <div class="grid two">
-            <div class="card">
-              <p>الخيار A: {{ s.choice_a }}</p>
-              <p>الخيار B: {{ s.choice_b }}</p>
-              <p>الخيار C: {{ s.choice_c }}</p>
-              <p>الخيار D: {{ s.choice_d }}</p>
-            </div>
-            <div class="card">
-              <p>الإجابة المقترحة: {{ s.proposed_correct_choice }}</p>
-              <p>الشرح المقترح: {{ s.proposed_explanation }}</p>
-            </div>
-          </div>
+        <div>
+          <label>مصدر السؤال</label>
+          <select name="source" id="questionSource">
+            <option value="past">أسئلة امتحانات سابقة</option>
+            <option value="ai">أسئلة مولدة بالذكاء الاصطناعي</option>
+          </select>
+        </div>
+      </div>
+      <div class="grid two" id="examTypeRow">
+        <div>
+          <label>نوع الامتحان</label>
+          <select name="exam_type">
+            <option value="mid">منتصف الفصل</option>
+            <option value="final">نهائي</option>
+            <option value="both">كلاهما</option>
+          </select>
+        </div>
+      </div>
+      <label>نص السؤال (اختياري إذا كانت الصورة موجودة)</label>
+      <textarea name="question_text"></textarea>
+      <label>صورة السؤال (اختياري)</label>
+      <input type="file" id="imageInputCreate" name="image" accept="image/*" />
+      <div id="cropAreaCreate" class="crop-area hidden">
+        <img id="cropImageCreate" alt="قص الصورة" />
+        <div class="crop-actions">
+          <button class="btn ghost" type="button" id="applyCropCreate">قص واعتماد</button>
+          <button class="btn ghost" type="button" id="resetCropCreate">إلغاء</button>
+        </div>
+      </div>
+      <div class="grid two">
+        <div>
+          <label>الخيار A</label>
+          <input name="choice_a" required />
+        </div>
+        <div>
+          <label>الخيار B</label>
+          <input name="choice_b" required />
+        </div>
+        <div>
+          <label>الخيار C</label>
+          <input name="choice_c" required />
+        </div>
+        <div>
+          <label>الخيار D</label>
+          <input name="choice_d" required />
+        </div>
+      </div>
+      <div class="grid two">
+        <div>
+          <label>الإجابة الصحيحة</label>
+          <select name="correct_choice">
+            <option value="A">A</option>
+            <option value="B">B</option>
+            <option value="C">C</option>
+            <option value="D">D</option>
+          </select>
+        </div>
+        <div>
+          <label>شرح (اختياري)</label>
+          <textarea name="explanation"></textarea>
+        </div>
+      </div>
+      <button class="btn" type="submit">إضافة السؤال</button>
+    </form>
+  </div>
+
+  <div class="card">
+    <h3>الأسئلة الأخيرة</h3>
+    {% if questions %}
+    <div class="filters">
+      <input id="qSearch" placeholder="ابحث عن سؤال..." />
+      <select id="qSubject">
+        <option value="">كل المواد</option>
+        {% for s in subjects %}
+          <option value="{{ s.name }}">{{ s.name }}</option>
+        {% endfor %}
+      </select>
+      <select id="qSource">
+        <option value="">كل المصادر</option>
+        <option value="past">أسئلة سابقة</option>
+        <option value="ai">أسئلة AI</option>
+      </select>
+      <select id="qExam">
+        <option value="">كل الامتحانات</option>
+        <option value="mid">منتصف</option>
+        <option value="final">نهائي</option>
+        <option value="both">كلاهما</option>
+      </select>
+    </div>
+    <div class="table" id="questionsTable">
+      <div class="table-row head q-row">
+        <span>ID</span>
+        <span>المادة</span>
+        <span>المصدر</span>
+        <span>الامتحان</span>
+        <span>المعاينة</span>
+        <span>إجراءات</span>
+      </div>
+      {% for q in questions %}
+      <div class="table-row q-row" data-id="{{ q.id }}" data-subject="{{ q.subject_name }}" data-source="{{ q.source }}" data-exam="{{ q.exam_type }}">
+        <span>#{{ q.id }}</span>
+        <span>{{ q.subject_name }}</span>
+        <span>{{ 'سابق' if q.source == 'past' else 'AI' }}</span>
+        <span>{% if q.source == 'past' %}{{ q.exam_type }}{% else %}—{% endif %}</span>
+        <span class="truncate">{{ q.question_text or 'سؤال بصيغة صورة' }}</span>
+        <span class="actions">
+          <a class="btn ghost" href="/admin/questions/{{ q.id }}/edit">تعديل</a>
+          <form method="post" action="/admin/questions/{{ q.id }}/delete" onsubmit="return confirm('تأكيد حذف السؤال؟')">
+            <button class="btn ghost danger" type="submit">حذف</button>
+          </form>
+        </span>
+      </div>
+      {% endfor %}
+    </div>
+    <div class="pagination" id="qPagination"></div>
+    {% else %}
+      <div class="empty-state">
+        <div class="empty-icon">🧾</div>
+        <h3>لا توجد أسئلة بعد</h3>
+        <p>ابدأ بإضافة سؤال جديد.</p>
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+<section class="tab-panel" id="tab-suggestions">
+  <div class="card">
+    <h3>اقتراحات الطلاب</h3>
+    {% if suggestions %}
+    <div class="table">
+      <div class="table-row head sug-row">
+        <span>#</span>
+        <span>الحالة</span>
+        <span>المعاينة</span>
+        <span>التاريخ</span>
+        <span>إجراءات</span>
+      </div>
+      {% for s in suggestions %}
+      <div class="table-row sug-row">
+        <span>#{{ s.id }}</span>
+        <span>{{ s.status }}</span>
+        <span class="truncate">{{ s.question_text or s.message or '—' }}</span>
+        <span>{{ s.created_at }}</span>
+        <span class="actions">
+          {% if s.type == 'question' %}
           <form method="post" action="/admin/suggestions/{{ s.id }}/publish" class="form inline">
             <select name="subject_id" required>
               {% for sub in subjects %}
@@ -136,60 +250,123 @@
             </select>
             <button class="btn" type="submit">نشر</button>
           </form>
-          <form method="post" action="/admin/suggestions/{{ s.id }}/reject">
-            <button class="btn ghost" type="submit">رفض</button>
+          {% endif %}
+          <form method="post" action="/admin/suggestions/{{ s.id }}/reject" onsubmit="return confirm('حذف الاقتراح؟')">
+            <button class="btn ghost danger" type="submit">حذف</button>
           </form>
-        {% else %}
-          <p>{{ s.message }}</p>
-        {% endif %}
+        </span>
       </div>
+      {% endfor %}
+    </div>
     {% else %}
-      <p>لا توجد اقتراحات.</p>
-    {% endfor %}
+      <div class="empty-state">
+        <div class="empty-icon">💡</div>
+        <h3>لا توجد اقتراحات</h3>
+        <p>لا توجد اقتراحات حالياً.</p>
+      </div>
+    {% endif %}
   </div>
 </section>
 
-<section class="card">
-  <h2>بلاغات الأخطاء</h2>
-  <div class="list">
-    {% for r in reports %}
-      <div class="item">
-        <div class="row">
-          <strong>#{{ r.id }}</strong>
-          <span class="badge">{{ r.status }}</span>
-        </div>
-        <p>{{ r.question_text }}</p>
-        <p>{{ r.report_text }}</p>
-        <form method="post" action="/admin/reports/{{ r.id }}/resolve" class="form inline">
-          <select name="correct_choice">
-            <option value="A">A</option>
-            <option value="B">B</option>
-            <option value="C">C</option>
-            <option value="D">D</option>
-          </select>
-          <input name="explanation" placeholder="شرح مختصر" />
-          <button class="btn" type="submit">تصحيح وحل</button>
+<section class="tab-panel" id="tab-reports">
+  <div class="card">
+    <h3>بلاغات الأخطاء</h3>
+    {% if reports %}
+    <div class="table">
+      <div class="table-row head rep-row">
+        <span>#</span>
+        <span>الحالة</span>
+        <span>السؤال</span>
+        <span>التاريخ</span>
+        <span>إجراءات</span>
+      </div>
+      {% for r in reports %}
+      <div class="table-row rep-row">
+        <span>#{{ r.id }}</span>
+        <span>{{ r.status }}</span>
+        <span class="truncate">{{ r.question_text }}</span>
+        <span>{{ r.created_at }}</span>
+        <span class="actions">
+          <a class="btn ghost" href="/admin/questions/{{ r.question_id }}/edit">فتح السؤال</a>
+          <form method="post" action="/admin/reports/{{ r.id }}/resolve">
+            <select name="correct_choice">
+              <option value="A">A</option>
+              <option value="B">B</option>
+              <option value="C">C</option>
+              <option value="D">D</option>
+            </select>
+            <input name="explanation" placeholder="شرح مختصر" />
+            <button class="btn" type="submit">تم الحل</button>
+          </form>
+        </span>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+      <div class="empty-state">
+        <div class="empty-icon">🚫</div>
+        <h3>لا توجد بلاغات</h3>
+        <p>لا توجد بلاغات حالياً.</p>
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+<section class="tab-panel" id="tab-csv">
+  <div class="card">
+    <h3>تصدير/استيراد CSV</h3>
+    <div class="grid two">
+      <div>
+        <h4>تصدير</h4>
+        <p class="muted small">يتضمن جميع الأسئلة والحقول الأساسية.</p>
+        <a class="btn" href="/admin/export.csv">تصدير CSV</a>
+      </div>
+      <div>
+        <h4>استيراد</h4>
+        <form method="post" action="/admin/import.csv" class="form" enctype="multipart/form-data">
+          <input type="file" name="file" accept=".csv" required />
+          <button class="btn ghost" type="submit">استيراد</button>
         </form>
       </div>
-    {% else %}
-      <p>لا توجد بلاغات.</p>
-    {% endfor %}
+    </div>
   </div>
-</section>
-
-<section class="card">
-  <h2>تصدير/استيراد CSV</h2>
-  <a class="btn" href="/admin/export.csv">تصدير CSV</a>
-  <form method="post" action="/admin/import.csv" class="form" enctype="multipart/form-data">
-    <input type="file" name="file" accept=".csv" required />
-    <button class="btn ghost" type="submit">استيراد</button>
-  </form>
 </section>
 {% endblock %}
 
 {% block scripts %}
 <script src="https://unpkg.com/cropperjs@1.6.2/dist/cropper.min.js"></script>
 <script>
+  const tabs = document.querySelectorAll('.tab-btn');
+  const panels = {
+    subjects: document.getElementById('tab-subjects'),
+    questions: document.getElementById('tab-questions'),
+    suggestions: document.getElementById('tab-suggestions'),
+    reports: document.getElementById('tab-reports'),
+    csv: document.getElementById('tab-csv'),
+  };
+  tabs.forEach((t) => {
+    t.addEventListener('click', () => {
+      tabs.forEach((b) => b.classList.remove('active'));
+      Object.values(panels).forEach((p) => p.classList.remove('active'));
+      t.classList.add('active');
+      panels[t.dataset.tab].classList.add('active');
+    });
+  });
+
+  const sourceSelect = document.getElementById('questionSource');
+  const examRow = document.getElementById('examTypeRow');
+  const toggleExam = () => {
+    if (sourceSelect.value === 'ai') {
+      examRow.style.display = 'none';
+    } else {
+      examRow.style.display = 'grid';
+    }
+  };
+  if (sourceSelect && examRow) {
+    sourceSelect.addEventListener('change', toggleExam);
+    toggleExam();
+  }
+
   (function () {
     const input = document.getElementById('imageInputCreate');
     const area = document.getElementById('cropAreaCreate');
@@ -228,5 +405,65 @@
       input.value = '';
     });
   })();
+
+  const qRows = Array.from(document.querySelectorAll('.q-row'));
+  const qPagination = document.getElementById('qPagination');
+  const qSearch = document.getElementById('qSearch');
+  const qSubject = document.getElementById('qSubject');
+  const qSource = document.getElementById('qSource');
+  const qExam = document.getElementById('qExam');
+  let page = 1;
+  const perPage = 20;
+
+  function filterRows() {
+    const text = (qSearch?.value || '').toLowerCase();
+    const subject = qSubject?.value || '';
+    const source = qSource?.value || '';
+    const exam = qExam?.value || '';
+    return qRows.filter((row) => {
+      const rText = row.querySelector('.truncate')?.textContent?.toLowerCase() || '';
+      const rSubject = row.dataset.subject || '';
+      const rSource = row.dataset.source || '';
+      const rExam = row.dataset.exam || '';
+      if (text && !rText.includes(text)) return false;
+      if (subject && rSubject !== subject) return false;
+      if (source && rSource !== source) return false;
+      if (exam && rExam !== exam) return false;
+      return true;
+    });
+  }
+
+  function renderTable() {
+    const rows = filterRows();
+    const totalPages = Math.max(1, Math.ceil(rows.length / perPage));
+    page = Math.min(page, totalPages);
+    qRows.forEach((r) => (r.style.display = 'none'));
+    rows.slice((page - 1) * perPage, page * perPage).forEach((r) => (r.style.display = 'grid'));
+    qPagination.innerHTML = '';
+    if (totalPages > 1) {
+      for (let i = 1; i <= totalPages; i++) {
+        const a = document.createElement('a');
+        a.className = 'page' + (i === page ? ' active' : '');
+        a.textContent = i;
+        a.href = '#';
+        a.onclick = (e) => {
+          e.preventDefault();
+          page = i;
+          renderTable();
+        };
+        qPagination.appendChild(a);
+      }
+    }
+    if (qSource && qExam) {
+      qExam.style.display = qSource.value === 'past' ? 'inline-block' : '';
+    }
+  }
+
+  [qSearch, qSubject, qSource, qExam].forEach((el) => {
+    if (!el) return;
+    el.addEventListener('input', () => { page = 1; renderTable(); });
+    el.addEventListener('change', () => { page = 1; renderTable(); });
+  });
+  renderTable();
 </script>
 {% endblock %}

@@ -1,55 +1,23 @@
 ﻿{% set title = "الرئيسية" %}
 {% extends "base.html" %}
 {% block content %}
-<section class="hero">
+<section class="hero center">
   <div class="hero-text">
     <h1>بنك الإسراء</h1>
-    <p>منصة أسئلة الامتحانات السابقة للطلاب</p>
+    <p>منصة أسئلة الامتحانات السابقة والذكاء الاصطناعي للطلاب</p>
     <div class="hero-actions">
+      <a class="btn" href="/questions">ابدأ الآن</a>
       {% if user and user.role == 'admin' %}
-        <a class="btn" href="/admin">الإدارة</a>
-      {% else %}
-        <a class="btn ghost" href="/login">دخول الإدارة</a>
+        <a class="btn ghost" href="/admin">الإدارة</a>
       {% endif %}
     </div>
   </div>
 </section>
 
-<section class="card">
-  <h2>المواد</h2>
-  <div class="grid">
-    {% for s in subjects %}
-      <a class="subject" href="/subjects/{{ s.id }}?exam=mid">{{ s.name }}</a>
-    {% else %}
-      <p>لا توجد مواد بعد.</p>
-    {% endfor %}
-  </div>
+<section class="card narrow center">
+  <h2>الأسئلة</h2>
+  <p class="muted">ابدأ من هنا لاختيار نوع الأسئلة ثم المادة بكل سهولة.</p>
+  <a class="btn" href="/questions">الانتقال إلى الأسئلة</a>
 </section>
 
-<section class="grid two">
-  <div class="card">
-    <h2>أسئلة الامتحانات السابقة</h2>
-    <div class="list">
-      {% for q in past_questions %}
-        <a class="question-item" href="/questions/{{ q.id }}">
-          <span>{{ q.question_text or 'سؤال بصيغة صورة' }}</span>
-        </a>
-      {% else %}
-        <p>لا توجد أسئلة بعد.</p>
-      {% endfor %}
-    </div>
-  </div>
-  <div class="card">
-    <h2>أسئلة مولدة بالذكاء الاصطناعي</h2>
-    <div class="list">
-      {% for q in ai_questions %}
-        <a class="question-item" href="/questions/{{ q.id }}">
-          <span>{{ q.question_text or 'سؤال بصيغة صورة' }}</span>
-        </a>
-      {% else %}
-        <p>لا توجد أسئلة بعد.</p>
-      {% endfor %}
-    </div>
-  </div>
-</section>
 {% endblock %}

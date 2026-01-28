@@ -1,0 +1,20 @@
+{% set title = "اختيار نوع الأسئلة" %}
+{% extends "base.html" %}
+{% block content %}
+<section class="card">
+  <h2>اختر نوع الأسئلة</h2>
+  <p class="muted">اختر مصدر الأسئلة الذي تريده قبل المتابعة.</p>
+  <div class="card-grid">
+    <a class="pick-card" href="/questions/past">
+      <div class="card-icon">📄</div>
+      <h4>أسئلة سابقة</h4>
+      <p>أسئلة مأخوذة من امتحانات سابقة</p>
+    </a>
+    <a class="pick-card" href="/subjects?source=ai">
+      <div class="card-icon">✨</div>
+      <h4>أسئلة مولدة بالذكاء الاصطناعي</h4>
+      <p>أسئلة مولدة بالذكاء الاصطناعي</p>
+    </a>
+  </div>
+</section>
+{% endblock %}

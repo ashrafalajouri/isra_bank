@@ -1,0 +1,30 @@
+{% set title = "المواد" %}
+{% extends "base.html" %}
+{% block content %}
+<section class="card">
+  <div class="breadcrumb">
+    <a href="/">الرئيسية</a>
+    <span>›</span>
+    {% if source == 'ai' %}
+      <a href="/questions">أسئلة AI</a>
+    {% else %}
+      <a href="/questions">أسئلة سابقة</a>
+      <span>›</span>
+      <a href="/questions/past">{{ 'منتصف الفصل' if exam == 'mid' else 'نهائي' if exam == 'final' else 'كلاهما' }}</a>
+    {% endif %}
+  </div>
+  <h2>اختر المادة</h2>
+  <div class="card-grid">
+    {% for s in subjects %}
+      <a class="pick-card" href="/subjects/{{ s.id }}?source={{ source }}{% if source == 'past' %}&exam={{ exam }}{% endif %}">
+        <div class="card-icon">📘</div>
+        <h4>{{ s.name }}</h4>
+        <p>عرض الأسئلة</p>
+      </a>
+    {% else %}
+      <p>لا توجد مواد بعد.</p>
+    {% endfor %}
+  </div>
+  <a class="btn ghost" href="{% if source == 'ai' %}/questions{% else %}/questions/past{% endif %}">رجوع</a>
+</section>
+{% endblock %}
