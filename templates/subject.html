@@ -1,0 +1,38 @@
+﻿{% set title = subject.name %}
+{% extends "base.html" %}
+{% block content %}
+<section class="card">
+  <div class="subject-header">
+    <h2>{{ subject.name }}</h2>
+    <div class="tabs">
+      <a class="tab {{ 'active' if exam == 'mid' else '' }}" href="/subjects/{{ subject.id }}?exam=mid">منتصف الفصل</a>
+      <a class="tab {{ 'active' if exam == 'final' else '' }}" href="/subjects/{{ subject.id }}?exam=final">نهائي</a>
+      <a class="tab {{ 'active' if exam == 'both' else '' }}" href="/subjects/{{ subject.id }}?exam=both">كلاهما</a>
+    </div>
+  </div>
+  <form class="search" method="get" action="/subjects/{{ subject.id }}">
+    <input type="hidden" name="exam" value="{{ exam }}" />
+    <input name="q" placeholder="بحث عن سؤال" value="{{ q }}" />
+    <button class="btn ghost" type="submit">بحث</button>
+  </form>
+  <div class="list">
+    {% for q in questions %}
+      <a class="question-item" href="/questions/{{ q.id }}">
+        <span>{{ q.question_text or 'سؤال بصيغة صورة' }}</span>
+        <em>
+          {% if q.exam_type == 'mid' %}منتصف الفصل{% elif q.exam_type == 'final' %}نهائي{% else %}كلاهما{% endif %}
+        </em>
+      </a>
+    {% else %}
+      <p>لا توجد أسئلة بعد.</p>
+    {% endfor %}
+  </div>
+  {% if total_pages > 1 %}
+  <div class="pagination">
+    {% for p in range(1, total_pages + 1) %}
+      <a class="page {{ 'active' if p == page else '' }}" href="/subjects/{{ subject.id }}?exam={{ exam }}&q={{ q }}&page={{ p }}">{{ p }}</a>
+    {% endfor %}
+  </div>
+  {% endif %}
+</section>
+{% endblock %}

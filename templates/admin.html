@@ -1,0 +1,213 @@
+﻿{% set title = "الإدارة" %}
+{% extends "base.html" %}
+{% block content %}
+<link rel="stylesheet" href="https://unpkg.com/cropperjs@1.6.2/dist/cropper.min.css">
+<section class="card">
+  <h2>إدارة المواد</h2>
+  <form method="post" action="/admin/subjects/create" class="form inline">
+    <input name="name" placeholder="اسم المادة" required />
+    <button class="btn" type="submit">إضافة</button>
+  </form>
+  <div class="list">
+    {% for s in subjects %}
+      <div class="row">
+        <span>{{ s.name }}</span>
+        <form method="post" action="/admin/subjects/{{ s.id }}/delete">
+          <button class="btn ghost" type="submit">حذف</button>
+        </form>
+      </div>
+    {% else %}
+      <p>لا توجد مواد بعد.</p>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="card">
+  <h2>إضافة سؤال</h2>
+  <form method="post" action="/admin/questions/create" class="form" enctype="multipart/form-data">
+    <label>المادة</label>
+    <select name="subject_id" required>
+      {% for s in subjects %}
+        <option value="{{ s.id }}">{{ s.name }}</option>
+      {% endfor %}
+    </select>
+    <label>نوع الامتحان</label>
+    <select name="exam_type">
+      <option value="mid">منتصف الفصل</option>
+      <option value="final">نهائي</option>
+      <option value="both">كلاهما</option>
+    </select>
+    <label>مصدر السؤال</label>
+    <select name="source">
+      <option value="past">أسئلة امتحانات سابقة</option>
+      <option value="ai">أسئلة مولدة بالذكاء الاصطناعي</option>
+    </select>
+    <label>نص السؤال (اختياري إذا كانت الصورة موجودة)</label>
+    <textarea name="question_text"></textarea>
+    <label>صورة السؤال (اختياري)</label>
+    <input type="file" id="imageInputCreate" name="image" accept="image/*" />
+    <div id="cropAreaCreate" class="crop-area hidden">
+      <img id="cropImageCreate" alt="قص الصورة" />
+      <div class="crop-actions">
+        <button class="btn ghost" type="button" id="applyCropCreate">قص واعتماد</button>
+        <button class="btn ghost" type="button" id="resetCropCreate">إلغاء</button>
+      </div>
+    </div>
+    <label>الخيار A</label>
+    <input name="choice_a" required />
+    <label>الخيار B</label>
+    <input name="choice_b" required />
+    <label>الخيار C</label>
+    <input name="choice_c" required />
+    <label>الخيار D</label>
+    <input name="choice_d" required />
+    <label>الإجابة الصحيحة</label>
+    <select name="correct_choice">
+      <option value="A">A</option>
+      <option value="B">B</option>
+      <option value="C">C</option>
+      <option value="D">D</option>
+    </select>
+    <label>شرح (اختياري)</label>
+    <textarea name="explanation"></textarea>
+    <button class="btn" type="submit">إضافة السؤال</button>
+  </form>
+</section>
+
+<section class="card">
+  <h2>الأسئلة الأخيرة</h2>
+  <div class="list">
+    {% for q in questions %}
+      <div class="row">
+        <span>{{ q.subject_name }} — {{ q.question_text or 'سؤال بصيغة صورة' }} ({{ 'سابق' if q.source == 'past' else 'AI' }})</span>
+        <div class="actions">
+          <a class="btn ghost" href="/admin/questions/{{ q.id }}/edit">تعديل</a>
+          <form method="post" action="/admin/questions/{{ q.id }}/delete">
+            <button class="btn ghost" type="submit">حذف</button>
+          </form>
+        </div>
+      </div>
+    {% else %}
+      <p>لا توجد أسئلة بعد.</p>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="card">
+  <h2>اقتراحات الطلاب</h2>
+  <div class="list">
+    {% for s in suggestions %}
+      <div class="item">
+        <div class="row">
+          <strong>#{{ s.id }}</strong>
+          <span class="badge">{{ s.status }}</span>
+        </div>
+        {% if s.type == 'question' %}
+          <p>{{ s.question_text }}</p>
+          <form method="post" action="/admin/suggestions/{{ s.id }}/publish" class="form inline">
+            <select name="subject_id" required>
+              {% for sub in subjects %}
+                <option value="{{ sub.id }}">{{ sub.name }}</option>
+              {% endfor %}
+            </select>
+            <select name="exam_type">
+              <option value="mid">منتصف الفصل</option>
+              <option value="final">نهائي</option>
+              <option value="both">كلاهما</option>
+            </select>
+            <button class="btn" type="submit">نشر</button>
+          </form>
+          <form method="post" action="/admin/suggestions/{{ s.id }}/reject">
+            <button class="btn ghost" type="submit">رفض</button>
+          </form>
+        {% else %}
+          <p>{{ s.message }}</p>
+        {% endif %}
+      </div>
+    {% else %}
+      <p>لا توجد اقتراحات.</p>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="card">
+  <h2>بلاغات الأخطاء</h2>
+  <div class="list">
+    {% for r in reports %}
+      <div class="item">
+        <div class="row">
+          <strong>#{{ r.id }}</strong>
+          <span class="badge">{{ r.status }}</span>
+        </div>
+        <p>{{ r.question_text }}</p>
+        <p>{{ r.report_text }}</p>
+        <form method="post" action="/admin/reports/{{ r.id }}/resolve" class="form inline">
+          <select name="correct_choice">
+            <option value="A">A</option>
+            <option value="B">B</option>
+            <option value="C">C</option>
+            <option value="D">D</option>
+          </select>
+          <input name="explanation" placeholder="شرح مختصر" />
+          <button class="btn" type="submit">تصحيح وحل</button>
+        </form>
+      </div>
+    {% else %}
+      <p>لا توجد بلاغات.</p>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="card">
+  <h2>تصدير/استيراد CSV</h2>
+  <a class="btn" href="/admin/export.csv">تصدير CSV</a>
+  <form method="post" action="/admin/import.csv" class="form" enctype="multipart/form-data">
+    <input type="file" name="file" accept=".csv" required />
+    <button class="btn ghost" type="submit">استيراد</button>
+  </form>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://unpkg.com/cropperjs@1.6.2/dist/cropper.min.js"></script>
+<script>
+  (function () {
+    const input = document.getElementById('imageInputCreate');
+    const area = document.getElementById('cropAreaCreate');
+    const img = document.getElementById('cropImageCreate');
+    const applyBtn = document.getElementById('applyCropCreate');
+    const resetBtn = document.getElementById('resetCropCreate');
+    if (!input || !area || !img || !applyBtn || !resetBtn) return;
+    let cropper = null;
+
+    input.addEventListener('change', () => {
+      const file = input.files && input.files[0];
+      if (!file) return;
+      const url = URL.createObjectURL(file);
+      img.src = url;
+      area.classList.remove('hidden');
+      if (cropper) cropper.destroy();
+      cropper = new Cropper(img, { viewMode: 1, autoCropArea: 0.8 });
+    });
+
+    applyBtn.addEventListener('click', () => {
+      if (!cropper) return;
+      cropper.getCroppedCanvas().toBlob((blob) => {
+        if (!blob) return;
+        const file = new File([blob], 'question.jpg', { type: 'image/jpeg' });
+        const dt = new DataTransfer();
+        dt.items.add(file);
+        input.files = dt.files;
+        area.classList.add('hidden');
+      }, 'image/jpeg', 0.9);
+    });
+
+    resetBtn.addEventListener('click', () => {
+      if (cropper) cropper.destroy();
+      cropper = null;
+      area.classList.add('hidden');
+      input.value = '';
+    });
+  })();
+</script>
+{% endblock %}

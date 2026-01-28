@@ -1,0 +1,57 @@
+﻿{% set title = "سؤال" %}
+{% extends "base.html" %}
+{% block content %}
+<section class="card">
+  <h2>
+    {{ q.subject_name }} —
+    {% if q.exam_type == 'mid' %}منتصف الفصل{% elif q.exam_type == 'final' %}نهائي{% else %}كلاهما{% endif %}
+  </h2>
+  {% if q.image_path %}
+    <img class="question-image" src="/static/{{ q.image_path }}" alt="صورة السؤال" />
+  {% endif %}
+  {% if q.question_text %}
+    <p class="question-text">{{ q.question_text }}</p>
+  {% endif %}
+
+  <form method="post" action="/questions/{{ q.id }}/answer" class="choices">
+    <label><input type="radio" name="choice" value="A" required /> A) {{ q.choice_a }}</label>
+    <label><input type="radio" name="choice" value="B" /> B) {{ q.choice_b }}</label>
+    <label><input type="radio" name="choice" value="C" /> C) {{ q.choice_c }}</label>
+    <label><input type="radio" name="choice" value="D" /> D) {{ q.choice_d }}</label>
+    <button class="btn" type="submit">إرسال الإجابة</button>
+  </form>
+
+  {% if user %}
+  <a class="link" href="/questions/{{ q.id }}/result">عرض آخر نتيجة</a>
+  {% else %}
+  <p class="muted">سجّل الدخول لعرض النتائج</p>
+  {% endif %}
+
+  <div class="nav-links">
+    {% if prev_id %}
+      <a class="btn ghost" href="/questions/{{ prev_id }}">السؤال السابق</a>
+    {% endif %}
+    {% if next_id %}
+      <a class="btn ghost" href="/questions/{{ next_id }}">السؤال التالي</a>
+    {% endif %}
+  </div>
+
+  <hr />
+  <h3>الإبلاغ عن خطأ</h3>
+  <form method="post" action="/questions/{{ q.id }}/report" class="form">
+    <label>وصف الخطأ</label>
+    <textarea name="report_text" required></textarea>
+    <label>الإجابة الصحيحة المقترحة (اختياري)</label>
+    <select name="proposed_correct_choice">
+      <option value="">--</option>
+      <option value="A">A</option>
+      <option value="B">B</option>
+      <option value="C">C</option>
+      <option value="D">D</option>
+    </select>
+    <label>شرح مقترح (اختياري)</label>
+    <textarea name="proposed_explanation"></textarea>
+    <button class="btn ghost" type="submit">إرسال البلاغ</button>
+  </form>
+</section>
+{% endblock %}

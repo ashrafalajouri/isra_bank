@@ -1,0 +1,14 @@
+﻿{% set title = "تسجيل الدخول" %}
+{% extends "base.html" %}
+{% block content %}
+<section class="card narrow">
+  <h2>تسجيل الدخول</h2>
+  <form method="post" action="/login" class="form">
+    <label>اسم المستخدم</label>
+    <input name="username" required />
+    <label>كلمة المرور</label>
+    <input type="password" name="password" required />
+    <button class="btn" type="submit">دخول</button>
+  </form>
+</section>
+{% endblock %}

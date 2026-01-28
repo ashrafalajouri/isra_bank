@@ -1,0 +1,35 @@
+﻿{% set title = "نتيجة السؤال" %}
+{% extends "base.html" %}
+{% block content %}
+<section class="card">
+  <h2>نتيجة السؤال</h2>
+  {% if q.image_path %}
+    <img class="question-image" src="/static/{{ q.image_path }}" alt="صورة السؤال" />
+  {% endif %}
+  {% if q.question_text %}
+    <p class="question-text">{{ q.question_text }}</p>
+  {% endif %}
+  {% if attempt %}
+    {% if attempt.is_correct == 1 %}
+      <div class="alert success">إجابة صحيحة ✅</div>
+    {% else %}
+      <div class="alert error">إجابة خاطئة ❌</div>
+    {% endif %}
+    <p>الإجابة الصحيحة: <strong>{{ q.correct_choice }}</strong></p>
+    {% if attempt.is_correct == 0 and q.explanation %}
+      <p class="explain">{{ q.explanation }}</p>
+    {% endif %}
+  {% else %}
+    <p>لا توجد محاولة حتى الآن.</p>
+  {% endif %}
+  <div class="nav-links">
+    <a class="btn" href="/questions/{{ q.id }}">عودة للسؤال</a>
+    {% if prev_id %}
+      <a class="btn ghost" href="/questions/{{ prev_id }}">السؤال السابق</a>
+    {% endif %}
+    {% if next_id %}
+      <a class="btn ghost" href="/questions/{{ next_id }}">السؤال التالي</a>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

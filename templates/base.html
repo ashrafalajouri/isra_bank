@@ -1,0 +1,92 @@
+﻿<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{{ title }} | بنك الإسراء</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <header class="nav">
+    <div class="brand">
+      <a href="/">بنك الإسراء</a>
+    </div>
+    <nav>
+      <a href="/">الرئيسية</a>
+      <a href="/dashboard">لوحة التحكم</a>
+      <a href="/contact">تواصل</a>
+      {% if user and user.role == 'admin' %}
+        <a href="/admin">الإدارة</a>
+      {% endif %}
+      {% if user %}
+        <a href="/logout">تسجيل الخروج</a>
+      {% else %}
+        <a href="/login">تسجيل الدخول</a>
+      {% endif %}
+    </nav>
+  </header>
+
+  <main class="container">
+    {% if flash %}
+      <div class="alert">{{ flash }}</div>
+    {% endif %}
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="footer">
+    © بنك الإسراء — Ashraf Alajouri
+  </footer>
+  <div id="imgModal" class="img-modal hidden" role="dialog" aria-modal="true">
+    <span class="img-modal-close" id="imgModalClose">×</span>
+    <div class="img-modal-toolbar">
+      <button class="btn ghost" id="imgZoomIn" type="button">تكبير</button>
+      <button class="btn ghost" id="imgZoomOut" type="button">تصغير</button>
+      <button class="btn ghost" id="imgZoomReset" type="button">إعادة</button>
+    </div>
+    <img id="imgModalContent" alt="صورة مكبرة" />
+  </div>
+  <script>
+    (function () {
+      const modal = document.getElementById('imgModal');
+      const modalImg = document.getElementById('imgModalContent');
+      const closeBtn = document.getElementById('imgModalClose');
+      if (!modal || !modalImg || !closeBtn) return;
+
+      let scale = 1;
+      const setScale = (value) => {
+        scale = Math.min(5, Math.max(1, value));
+        modalImg.style.transform = `scale(${scale})`;
+      };
+
+      document.addEventListener('click', (e) => {
+        const img = e.target.closest && e.target.closest('.question-image');
+        if (!img) return;
+        modalImg.src = img.src;
+        setScale(1);
+        modal.classList.remove('hidden');
+      });
+
+      const close = () => {
+        modal.classList.add('hidden');
+        modalImg.src = '';
+        setScale(1);
+      };
+      closeBtn.addEventListener('click', close);
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) close();
+      });
+
+      document.getElementById('imgZoomIn')?.addEventListener('click', () => setScale(scale + 0.2));
+      document.getElementById('imgZoomOut')?.addEventListener('click', () => setScale(scale - 0.2));
+      document.getElementById('imgZoomReset')?.addEventListener('click', () => setScale(1));
+
+      modal.addEventListener('wheel', (e) => {
+        if (modal.classList.contains('hidden')) return;
+        e.preventDefault();
+        setScale(scale + (e.deltaY < 0 ? 0.1 : -0.1));
+      }, { passive: false });
+    })();
+  </script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

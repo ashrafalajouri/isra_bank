@@ -1,0 +1,25 @@
+﻿{% set title = "لوحة التحكم" %}
+{% extends "base.html" %}
+{% block content %}
+<section class="grid two">
+  <div class="card">
+    <h2>إحصائياتك</h2>
+    <ul class="stats">
+      <li>المحاولات: <strong>{{ stats.total_attempts or 0 }}</strong></li>
+      <li>الإجابات الصحيحة: <strong>{{ stats.total_correct or 0 }}</strong></li>
+      <li>النقاط: <strong>{{ user.points }}</strong></li>
+      <li>ترتيبك: <strong>{{ rank }}</strong></li>
+    </ul>
+  </div>
+  <div class="card">
+    <h2>أفضل 10 طلاب</h2>
+    <ol class="leaderboard">
+      {% for u in leaderboard %}
+      <li>{{ u.full_name or u.username }} — {{ u.points }} نقطة</li>
+      {% else %}
+      <li>لا يوجد بيانات بعد</li>
+      {% endfor %}
+    </ol>
+  </div>
+</section>
+{% endblock %}

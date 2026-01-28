@@ -1,0 +1,95 @@
+﻿{% set title = "تعديل السؤال" %}
+{% extends "base.html" %}
+{% block content %}
+<link rel="stylesheet" href="https://unpkg.com/cropperjs@1.6.2/dist/cropper.min.css">
+<section class="card">
+  <h2>تعديل السؤال</h2>
+  <p class="muted">
+    {{ q.subject_name }} —
+    {% if q.exam_type == 'mid' %}منتصف الفصل{% elif q.exam_type == 'final' %}نهائي{% else %}كلاهما{% endif %}
+  </p>
+  <form method="post" action="/admin/questions/{{ q.id }}/update" class="form" enctype="multipart/form-data">
+    <label>نص السؤال (اختياري إذا كانت الصورة موجودة)</label>
+    <textarea name="question_text">{{ q.question_text }}</textarea>
+    {% if q.image_path %}
+      <img class="question-image" src="/static/{{ q.image_path }}" alt="صورة السؤال" />
+    {% endif %}
+    <label>رفع صورة جديدة (اختياري)</label>
+    <input type="file" id="imageInputEdit" name="image" accept="image/*" />
+    <div id="cropAreaEdit" class="crop-area hidden">
+      <img id="cropImageEdit" alt="قص الصورة" />
+      <div class="crop-actions">
+        <button class="btn ghost" type="button" id="applyCropEdit">قص واعتماد</button>
+        <button class="btn ghost" type="button" id="resetCropEdit">إلغاء</button>
+      </div>
+    </div>
+    <label>الخيار A</label>
+    <input name="choice_a" required value="{{ q.choice_a }}" />
+    <label>الخيار B</label>
+    <input name="choice_b" required value="{{ q.choice_b }}" />
+    <label>الخيار C</label>
+    <input name="choice_c" required value="{{ q.choice_c }}" />
+    <label>الخيار D</label>
+    <input name="choice_d" required value="{{ q.choice_d }}" />
+    <label>الإجابة الصحيحة</label>
+    <select name="correct_choice">
+      <option value="A" {{ 'selected' if q.correct_choice == 'A' else '' }}>A</option>
+      <option value="B" {{ 'selected' if q.correct_choice == 'B' else '' }}>B</option>
+      <option value="C" {{ 'selected' if q.correct_choice == 'C' else '' }}>C</option>
+      <option value="D" {{ 'selected' if q.correct_choice == 'D' else '' }}>D</option>
+    </select>
+    <label>شرح (اختياري)</label>
+    <textarea name="explanation">{{ q.explanation }}</textarea>
+    <label>مصدر السؤال</label>
+    <select name="source">
+      <option value="past" {{ 'selected' if q.source == 'past' else '' }}>أسئلة امتحانات سابقة</option>
+      <option value="ai" {{ 'selected' if q.source == 'ai' else '' }}>أسئلة مولدة بالذكاء الاصطناعي</option>
+    </select>
+    <button class="btn" type="submit">حفظ التغييرات</button>
+  </form>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://unpkg.com/cropperjs@1.6.2/dist/cropper.min.js"></script>
+<script>
+  (function () {
+    const input = document.getElementById('imageInputEdit');
+    const area = document.getElementById('cropAreaEdit');
+    const img = document.getElementById('cropImageEdit');
+    const applyBtn = document.getElementById('applyCropEdit');
+    const resetBtn = document.getElementById('resetCropEdit');
+    if (!input || !area || !img || !applyBtn || !resetBtn) return;
+    let cropper = null;
+
+    input.addEventListener('change', () => {
+      const file = input.files && input.files[0];
+      if (!file) return;
+      const url = URL.createObjectURL(file);
+      img.src = url;
+      area.classList.remove('hidden');
+      if (cropper) cropper.destroy();
+      cropper = new Cropper(img, { viewMode: 1, autoCropArea: 0.8 });
+    });
+
+    applyBtn.addEventListener('click', () => {
+      if (!cropper) return;
+      cropper.getCroppedCanvas().toBlob((blob) => {
+        if (!blob) return;
+        const file = new File([blob], 'question.jpg', { type: 'image/jpeg' });
+        const dt = new DataTransfer();
+        dt.items.add(file);
+        input.files = dt.files;
+        area.classList.add('hidden');
+      }, 'image/jpeg', 0.9);
+    });
+
+    resetBtn.addEventListener('click', () => {
+      if (cropper) cropper.destroy();
+      cropper = null;
+      area.classList.add('hidden');
+      input.value = '';
+    });
+  })();
+</script>
+{% endblock %}

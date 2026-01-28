@@ -1,0 +1,54 @@
+﻿{% set title = "تواصل معنا" %}
+{% extends "base.html" %}
+{% block content %}
+<section class="grid two">
+  <div class="card">
+    <h2>اقتراح سؤال جديد</h2>
+    <form method="post" action="/contact/suggest" class="form">
+      <label>المادة</label>
+      <select name="subject_id">
+        <option value="">--</option>
+        {% for s in subjects %}
+          <option value="{{ s.id }}">{{ s.name }}</option>
+        {% endfor %}
+      </select>
+      <label>أو اكتب اسم مادة غير موجودة</label>
+      <input name="subject_name" />
+      <label>نوع الامتحان</label>
+      <select name="exam_type">
+        <option value="mid">منتصف الفصل</option>
+        <option value="final">نهائي</option>
+        <option value="both">كلاهما</option>
+      </select>
+      <label>نص السؤال</label>
+      <textarea name="question_text"></textarea>
+      <label>الخيار A</label>
+      <input name="choice_a" />
+      <label>الخيار B</label>
+      <input name="choice_b" />
+      <label>الخيار C</label>
+      <input name="choice_c" />
+      <label>الخيار D</label>
+      <input name="choice_d" />
+      <label>الإجابة الصحيحة</label>
+      <select name="proposed_correct_choice">
+        <option value="A">A</option>
+        <option value="B">B</option>
+        <option value="C">C</option>
+        <option value="D">D</option>
+      </select>
+      <label>شرح (اختياري)</label>
+      <textarea name="proposed_explanation"></textarea>
+      <button class="btn" type="submit">إرسال الاقتراح</button>
+    </form>
+  </div>
+  <div class="card">
+    <h2>رسالة عامة</h2>
+    <form method="post" action="/contact/message" class="form">
+      <label>الرسالة</label>
+      <textarea name="message" required></textarea>
+      <button class="btn ghost" type="submit">إرسال</button>
+    </form>
+  </div>
+</section>
+{% endblock %}
