@@ -1,4 +1,4 @@
-﻿# Bank Al-Isra (بنك الإسراء)
+# Bank Al-Isra (بنك الإسراء)
 
 ## تشغيل المشروع
 
@@ -22,9 +22,7 @@ uvicorn app:app --reload
 http://127.0.0.1:8000
 ```
 
-## حساب الأدمن الافتراضي
-- username: ashraf
-- password: tCMQq5Y9u40-lqVVLNuwQw
+
 
 > مهم: غيّر كلمة المرور في `app.py` بعد أول تشغيل، وكذلك `SECRET_KEY`.
 
