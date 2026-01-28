@@ -297,28 +297,8 @@ def register_get(request: Request):
 
 @app.post("/register")
 def register_post(request: Request, username: str = Form(...), password: str = Form(...), full_name: Optional[str] = Form(None)):
-    username = username.strip()
-    if len(username) < 3 or len(password) < 6:
-        request.session["flash"] = "الرجاء إدخال اسم مستخدم وكلمة مرور صالحة"
-        return RedirectResponse(url="/register", status_code=303)
-
-    conn = get_db()
-    try:
-        conn.execute(
-            "INSERT INTO users (username, full_name, password_hash, role, points, created_at) VALUES (?, ?, ?, 'user', 0, ?)",
-            (username, full_name, hash_password(password), now_iso()),
-        )
-        conn.commit()
-    except sqlite3.IntegrityError:
-        conn.close()
-        request.session["flash"] = "اسم المستخدم موجود بالفعل"
-        return RedirectResponse(url="/register", status_code=303)
-
-    user = conn.execute("SELECT * FROM users WHERE username = ?", (username,)).fetchone()
-    conn.close()
-    response = RedirectResponse(url="/dashboard", status_code=303)
-    login_user(response, user["id"])
-    return response
+    request.session["flash"] = "التسجيل للطلاب متوقف. الدخول متاح فقط للإدارة."
+    return RedirectResponse(url="/register", status_code=303)
 
 
 @app.get("/login", response_class=HTMLResponse)
@@ -333,6 +313,9 @@ def login_post(request: Request, username: str = Form(...), password: str = Form
     conn.close()
     if not user or not verify_password(password, user["password_hash"]):
         request.session["flash"] = "بيانات الدخول غير صحيحة"
+        return RedirectResponse(url="/login", status_code=303)
+    if user["role"] != "admin":
+        request.session["flash"] = "الدخول متاح فقط للإدارة"
         return RedirectResponse(url="/login", status_code=303)
 
     response = RedirectResponse(url="/dashboard", status_code=303)
@@ -349,7 +332,7 @@ def logout(request: Request):
 
 @app.get("/dashboard", response_class=HTMLResponse)
 def dashboard(request: Request):
-    user = require_user(request)
+    user = require_admin(request)
     if isinstance(user, RedirectResponse):
         return user
     conn = get_db()
@@ -439,9 +422,7 @@ def question_view(request: Request, question_id: int):
 
 @app.post("/questions/{question_id}/answer")
 def answer_question(request: Request, question_id: int, choice: str = Form(...)):
-    user = require_user(request)
-    if isinstance(user, RedirectResponse):
-        return user
+    user = get_current_user(request)
 
     conn = get_db()
     q = conn.execute("SELECT * FROM questions WHERE id = ?", (question_id,)).fetchone()
@@ -449,12 +430,37 @@ def answer_question(request: Request, question_id: int, choice: str = Form(...))
         conn.close()
         return RedirectResponse(url="/", status_code=303)
 
+    is_correct = 1 if choice == q["correct_choice"] else 0
+
+    if not user:
+        prev_q = conn.execute(
+            "SELECT id FROM questions WHERE subject_id = ? AND exam_type = ? AND id < ? ORDER BY id DESC LIMIT 1",
+            (q["subject_id"], q["exam_type"], q["id"]),
+        ).fetchone()
+        next_q = conn.execute(
+            "SELECT id FROM questions WHERE subject_id = ? AND exam_type = ? AND id > ? ORDER BY id ASC LIMIT 1",
+            (q["subject_id"], q["exam_type"], q["id"]),
+        ).fetchone()
+        conn.close()
+        attempt = {"is_correct": is_correct, "chosen_choice": choice}
+        return templates.TemplateResponse(
+            "question_result.html",
+            {
+                "request": request,
+                "user": None,
+                "q": q,
+                "attempt": attempt,
+                "prev_id": prev_q["id"] if prev_q else None,
+                "next_id": next_q["id"] if next_q else None,
+                "flash": request.session.pop("flash", None),
+            },
+        )
+
     already_correct = conn.execute(
         "SELECT 1 FROM attempts WHERE user_id = ? AND question_id = ? AND is_correct = 1 LIMIT 1",
         (user["id"], question_id),
     ).fetchone()
 
-    is_correct = 1 if choice == q["correct_choice"] else 0
     conn.execute(
         "INSERT INTO attempts (user_id, question_id, chosen_choice, is_correct, created_at) VALUES (?, ?, ?, ?, ?)",
         (user["id"], question_id, choice, is_correct, now_iso()),
@@ -470,9 +476,7 @@ def answer_question(request: Request, question_id: int, choice: str = Form(...))
 
 @app.get("/questions/{question_id}/result", response_class=HTMLResponse)
 def question_result(request: Request, question_id: int):
-    user = require_user(request)
-    if isinstance(user, RedirectResponse):
-        return user
+    user = get_current_user(request)
 
     conn = get_db()
     q = conn.execute(
@@ -490,10 +494,12 @@ def question_result(request: Request, question_id: int):
         "SELECT id FROM questions WHERE subject_id = ? AND exam_type = ? AND id > ? ORDER BY id ASC LIMIT 1",
         (q["subject_id"], q["exam_type"], q["id"]),
     ).fetchone()
-    attempt = conn.execute(
-        "SELECT * FROM attempts WHERE user_id = ? AND question_id = ? ORDER BY id DESC LIMIT 1",
-        (user["id"], question_id),
-    ).fetchone()
+    attempt = None
+    if user:
+        attempt = conn.execute(
+            "SELECT * FROM attempts WHERE user_id = ? AND question_id = ? ORDER BY id DESC LIMIT 1",
+            (user["id"], question_id),
+        ).fetchone()
     conn.close()
 
     return templates.TemplateResponse(

@@ -13,15 +13,15 @@
     </div>
     <nav>
       <a href="/">الرئيسية</a>
-      <a href="/dashboard">لوحة التحكم</a>
       <a href="/contact">تواصل</a>
       {% if user and user.role == 'admin' %}
         <a href="/admin">الإدارة</a>
+        <a href="/dashboard">لوحة التحكم</a>
       {% endif %}
       {% if user %}
         <a href="/logout">تسجيل الخروج</a>
       {% else %}
-        <a href="/login">تسجيل الدخول</a>
+        <a href="/login">دخول الإدارة</a>
       {% endif %}
     </nav>
   </header>

@@ -6,11 +6,10 @@
     <h1>بنك الإسراء</h1>
     <p>منصة أسئلة الامتحانات السابقة للطلاب</p>
     <div class="hero-actions">
-      {% if user %}
-        <a class="btn" href="/dashboard">لوحة التحكم</a>
+      {% if user and user.role == 'admin' %}
+        <a class="btn" href="/admin">الإدارة</a>
       {% else %}
-        <a class="btn" href="/register">إنشاء حساب</a>
-        <a class="btn ghost" href="/login">تسجيل الدخول</a>
+        <a class="btn ghost" href="/login">دخول الإدارة</a>
       {% endif %}
     </div>
   </div>

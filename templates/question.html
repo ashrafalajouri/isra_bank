@@ -22,9 +22,7 @@
   </form>
 
   {% if user %}
-  <a class="link" href="/questions/{{ q.id }}/result">عرض آخر نتيجة</a>
-  {% else %}
-  <p class="muted">سجّل الدخول لعرض النتائج</p>
+    <a class="link" href="/questions/{{ q.id }}/result">عرض آخر نتيجة</a>
   {% endif %}
 
   <div class="nav-links">

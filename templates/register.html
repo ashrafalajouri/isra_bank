@@ -3,17 +3,8 @@
 {% block content %}
 <section class="card narrow">
   <h2>إنشاء حساب</h2>
-  <form method="post" action="/register" class="form">
-    <div class="alert">
-      تنبيه: لا تستخدم كلمة مرور حقيقية. اختر كلمة مرور خاصة بهذا الموقع فقط.
-    </div>
-    <label>اسم المستخدم</label>
-    <input name="username" required minlength="3" />
-    <label>الاسم الكامل (اختياري)</label>
-    <input name="full_name" />
-    <label>كلمة المرور</label>
-    <input type="password" name="password" required minlength="6" />
-    <button class="btn" type="submit">تسجيل</button>
-  </form>
+  <div class="alert">
+    التسجيل للطلاب متوقف. الدخول متاح فقط للإدارة.
+  </div>
 </section>
 {% endblock %}
