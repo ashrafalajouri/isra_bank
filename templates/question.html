@@ -35,7 +35,7 @@
         <span class="q-badge">سؤال #{{ q.id }}</span>
       </div>
       {% if q.image_path %}
-        <img class="question-image" src="/static/{{ q.image_path }}" alt="صورة السؤال" />
+        <img class="question-image" src="{{ url_for('static', path=q.image_path) }}" alt="صورة السؤال" />
       {% endif %}
       {% if q.question_text %}
         <p class="question-text">{{ q.question_text }}</p>

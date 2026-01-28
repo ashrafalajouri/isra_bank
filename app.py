@@ -18,11 +18,12 @@ from itsdangerous import URLSafeSerializer, BadSignature
 from starlette.middleware.sessions import SessionMiddleware
 
 APP_NAME = "Bank Al-Isra"
+BASE_DIR = Path(__file__).resolve().parent
 # IMPORTANT: Change this SECRET_KEY in production
 SECRET_KEY = "FBaa6P9yuuMHv79yoafs58UbhOUDj6NzRhWCa5HBdPMEMHZeRlCB0OXNj4ax2r9X"
 SESSION_COOKIE = "session"
-DB_PATH = "app.db"
-UPLOAD_DIR = Path("static/uploads")
+DB_PATH = str(BASE_DIR / "app.db")
+UPLOAD_DIR = BASE_DIR / "static" / "uploads"
 ALLOWED_IMAGE_EXTS = {".jpg", ".jpeg", ".png", ".webp", ".jfif"}
 
 @asynccontextmanager
@@ -32,8 +33,8 @@ async def lifespan(app: FastAPI):
     yield
 
 app = FastAPI(lifespan=lifespan)
-app.mount("/static", StaticFiles(directory="static"), name="static")
-templates = Jinja2Templates(directory="templates")
+app.mount("/static", StaticFiles(directory=BASE_DIR / "static"), name="static")
+templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
 app.add_middleware(SessionMiddleware, secret_key=SECRET_KEY, session_cookie="flash")
 
 

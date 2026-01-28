@@ -12,7 +12,7 @@
     <label>نص السؤال (اختياري إذا كانت الصورة موجودة)</label>
     <textarea name="question_text">{{ q.question_text }}</textarea>
     {% if q.image_path %}
-      <img class="question-image" src="/static/{{ q.image_path }}" alt="صورة السؤال" />
+      <img class="question-image" src="{{ url_for('static', path=q.image_path) }}" alt="صورة السؤال" />
     {% endif %}
     <label>رفع صورة جديدة (اختياري)</label>
     <input type="file" id="imageInputEdit" name="image" accept="image/*" />
